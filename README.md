@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CIVITAS PROPTECH v2.0
+### Enterprise Property Management, Solar Micro-Grids & Impact Investing Platform
 
-## Getting Started
+Civitas v2.0 is Ghana's premier integrated PropTech platform, built with **Next.js 14+ (App Router)**, **TypeScript**, **Tailwind CSS v4**, and **Supabase (PostgreSQL + PostGIS + pgvector)**.
 
-First, run the development server:
+---
+
+## 🌟 Key Features
+
+1. **Multi-Tenant Architecture**: Complete Row Level Security (RLS) isolation for Property Owners, Tenants, Technicians, and Diaspora Investors.
+2. **Ghana Post GPS Integration**: Automated digital address validation and spatial GIST indexing.
+3. **Ghana Rent Act (Act 220) Escrow Compliance**: Enforces 6-month advance rent deposit caps with automated Bank of Ghana escrow holding and release rules.
+4. **Mobile Money Multi-Rail Payments**: Supports MTN MoMo, Telecel Cash, AT Money, Paystack, and Wise USD transfers.
+5. **Solar Micro-Grid Telemetry & ESG Carbon Ledger**: Real-time kWh solar output tracking, lithium battery health gauges, and Verra VCS Carbon Offset Certificate generation.
+6. **24/7 SLA Maintenance Dispatch**: Guaranteed 2-hour emergency repair dispatch with artisan rating systems.
+7. **PWA (Progressive Web App)**: Installable on iOS & Android with offline-first service worker caching for field technicians in low-connectivity areas.
+
+---
+
+## 🚀 Quick Start (Local Development)
 
 ```bash
+# 1. Change to Next.js application directory
+cd civitas-next
+
+# 2. Install dependencies
+npm install
+
+# 3. Start local development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ☁️ Deployment Guide (Vercel)
 
-## Learn More
+### Option A: Deploy via Vercel CLI
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cd civitas-next
+npx vercel
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Option B: Deploy via GitHub / GitLab
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Push your repository to GitHub.
+2. Import the `civitas-next` directory into Vercel.
+3. Add Environment Variables from `.env.production.example`:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+4. Click **Deploy**.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🗄️ Database Setup (Supabase)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To initialize the PostgreSQL database schema:
+
+1. Log into your [Supabase Dashboard](https://supabase.com).
+2. Open the **SQL Editor**.
+3. Paste and run the complete SQL schema from `automation/layer1-supabase-schema.sql`.
+
+---
+
+## 📜 License & Copyright
+
+© 2025 Civitas Estate & Maintenance Ltd. All rights reserved.

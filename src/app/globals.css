@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --forest:       #1A5C3A;
+  --forest-deep:  #0F3D26;
+  --forest-mid:   #2E7D52;
+  --forest-light: #D6EDE1;
+  --forest-xlt:   #EEF7F2;
+  --orange:       #E87722;
+  --orange-deep:  #B85A10;
+  --orange-light: #FAE8D5;
+  --orange-xlt:   #FEF6EF;
+  --teal:         #2E8B6A;
+  --teal-light:   #D4EFE6;
+  --amber:        #D97706;
+  --amber-light:  #FEF3C7;
+  --red:          #D94F3D;
+  --red-light:    #FDECEA;
+  --blue:         #2563EB;
+  --blue-light:   #EFF6FF;
+  --ink:          #111A14;
+  --ink-mid:      #3D5044;
+  --ink-muted:    #6B7E72;
+  --ink-faint:    #A8B8AE;
+  --rule:         #D8E4DC;
+  --surface:      #F5F9F6;
+  --white:        #FFFFFF;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-civitas-forest: var(--forest);
+  --color-civitas-forest-deep: var(--forest-deep);
+  --color-civitas-forest-mid: var(--forest-mid);
+  --color-civitas-forest-light: var(--forest-light);
+  --color-civitas-orange: var(--orange);
+  --color-civitas-orange-deep: var(--orange-deep);
+  --color-civitas-teal: var(--teal);
+  --color-civitas-ink: var(--ink);
+  --color-civitas-surface: var(--surface);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--surface);
+  color: var(--ink-mid);
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Glassmorphism helpers */
+.glass-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid rgba(216, 228, 220, 0.6);
+}
+
+.glass-dark {
+  background: rgba(15, 61, 38, 0.85);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Animations */
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--rule);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ink-faint);
 }

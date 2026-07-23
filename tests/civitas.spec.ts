@@ -90,6 +90,7 @@ test.describe('Auth Middleware — Unauthenticated Redirects', () => {
 test.describe('Portal — Sign-In', () => {
   test('renders email and password inputs', async ({ page }) => {
     await page.goto(`${BASE}/portal`);
+    await page.locator('input[type="email"]').first().waitFor({ state: 'visible', timeout: 15_000 });
     await expect(page.locator('input[type="email"]').first()).toBeVisible();
     await expect(page.locator('input[type="password"]').first()).toBeVisible();
   });
@@ -97,9 +98,7 @@ test.describe('Portal — Sign-In', () => {
   test('displays inline field errors for empty submission', async ({ page }) => {
     await page.goto(`${BASE}/portal`);
     const emailInput = page.locator('input[type="email"]').first();
-    await expect(emailInput).toBeVisible();
-    
-    // Fill invalid email directly to trigger state validation cleanly
+    await emailInput.waitFor({ state: 'visible', timeout: 15_000 });
     await emailInput.fill('invalid-email');
     await page.locator('button[type="submit"]').first().click();
     await expect(page.locator('text=Enter a valid email address')).toBeVisible();
@@ -108,7 +107,7 @@ test.describe('Portal — Sign-In', () => {
   test('displays inline error for invalid email format', async ({ page }) => {
     await page.goto(`${BASE}/portal`);
     const emailInput = page.locator('input[type="email"]').first();
-    await expect(emailInput).toBeVisible();
+    await emailInput.waitFor({ state: 'visible', timeout: 15_000 });
     await emailInput.fill('not-an-email');
     await page.locator('button[type="submit"]').first().click();
     await expect(page.locator('text=Enter a valid email address')).toBeVisible();
@@ -116,20 +115,20 @@ test.describe('Portal — Sign-In', () => {
 
   test('Forgot password link navigates to reset form', async ({ page }) => {
     await page.goto(`${BASE}/portal`);
-    const forgotBtn = page.locator('text=Forgot password?');
-    await expect(forgotBtn).toBeVisible();
+    const forgotBtn = page.locator('button', { hasText: 'Forgot password?' });
+    await forgotBtn.waitFor({ state: 'visible', timeout: 15_000 });
     await forgotBtn.click();
     await expect(page.locator('text=Send Password Reset Link')).toBeVisible();
   });
 
   test('Forgot password form shows error for invalid email', async ({ page }) => {
     await page.goto(`${BASE}/portal`);
-    const forgotBtn = page.locator('text=Forgot password?');
-    await expect(forgotBtn).toBeVisible();
+    const forgotBtn = page.locator('button', { hasText: 'Forgot password?' });
+    await forgotBtn.waitFor({ state: 'visible', timeout: 15_000 });
     await forgotBtn.click();
     
     const emailInput = page.locator('input[type="email"]').first();
-    await expect(emailInput).toBeVisible();
+    await emailInput.waitFor({ state: 'visible', timeout: 15_000 });
     await emailInput.fill('bad-email');
     await page.locator('button[type="submit"]').first().click();
     await expect(page.locator('text=Enter a valid email address')).toBeVisible();
@@ -137,12 +136,12 @@ test.describe('Portal — Sign-In', () => {
 
   test('Back to Sign In link returns to sign-in form from forgot mode', async ({ page }) => {
     await page.goto(`${BASE}/portal`);
-    const forgotBtn = page.locator('text=Forgot password?');
-    await expect(forgotBtn).toBeVisible();
+    const forgotBtn = page.locator('button', { hasText: 'Forgot password?' });
+    await forgotBtn.waitFor({ state: 'visible', timeout: 15_000 });
     await forgotBtn.click();
     
-    const backBtn = page.locator('text=← Back to Sign In');
-    await expect(backBtn).toBeVisible();
+    const backBtn = page.locator('button', { hasText: '← Back to Sign In' });
+    await backBtn.waitFor({ state: 'visible', timeout: 15_000 });
     await backBtn.click();
     await expect(page.locator('input[type="password"]').first()).toBeVisible();
   });
@@ -150,11 +149,11 @@ test.describe('Portal — Sign-In', () => {
   test('role selector dropdown opens and selects Tenant', async ({ page }) => {
     await page.goto(`${BASE}/portal`);
     const roleBtn = page.locator('button', { hasText: 'Property Owner' }).first();
-    await expect(roleBtn).toBeVisible();
+    await roleBtn.waitFor({ state: 'visible', timeout: 15_000 });
     await roleBtn.click();
     
     const tenantOption = page.locator('button', { hasText: 'Tenant' }).first();
-    await expect(tenantOption).toBeVisible();
+    await tenantOption.waitFor({ state: 'visible', timeout: 15_000 });
     await tenantOption.click();
     await expect(page.locator('button', { hasText: 'Tenant' }).first()).toBeVisible();
   });

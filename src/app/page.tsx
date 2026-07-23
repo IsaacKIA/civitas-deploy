@@ -47,13 +47,18 @@ export default function Home() {
       <Navbar />
 
       {/* 1. HERO SECTION */}
-      <section className="relative min-h-screen bg-[#0F3D26] text-white pt-28 pb-20 px-6 md:px-12 flex items-center overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(46,125,82,0.35)_0%,transparent_60%)] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(232,119,34,0.15)_0%,transparent_45%)] pointer-events-none" />
+      <section className="relative min-h-screen bg-[#0F3D26] text-white pt-28 pb-20 px-6 md:px-12 flex items-center overflow-hidden grain">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_50%,rgba(46,125,82,0.4)_0%,transparent_60%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_80%,rgba(232,119,34,0.18)_0%,transparent_45%)] pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_10%,rgba(214,237,225,0.06)_0%,transparent_50%)] pointer-events-none" />
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:60px_60px] pointer-events-none" />
 
+        {/* Floating decorative orbs */}
+        <div className="absolute top-24 right-[10%] w-72 h-72 rounded-full bg-[#E87722]/8 blur-3xl animate-float pointer-events-none" />
+        <div className="absolute bottom-20 left-[5%] w-56 h-56 rounded-full bg-[#2E7D52]/15 blur-3xl pointer-events-none" style={{animation:'float 7s ease-in-out infinite 1s'}} />
+
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
-          <div>
+          <div className="animate-fade-up">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#E87722]/15 border border-[#E87722]/30 text-[#E87722] text-[11px] font-semibold tracking-widest uppercase mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-[#E87722] animate-pulse" />
               Founded in Ghana · Operating Across Africa
@@ -61,7 +66,7 @@ export default function Home() {
 
             <h1 className="text-4xl sm:text-6xl lg:text-7xl font-serif font-bold tracking-tight leading-[1.05] mb-6">
               Smart Living.<br />
-              <em className="text-[#E87722] not-italic">Sustainable</em><br />
+              <em className="not-italic text-gradient-gold">Sustainable</em><br />
               <span className="text-[#D6EDE1]">Legacy.</span>
             </h1>
 
@@ -72,39 +77,45 @@ export default function Home() {
             <div className="flex flex-wrap gap-4 mb-12">
               <Link
                 href="/portal"
-                className="px-8 py-3.5 rounded-full bg-[#E87722] hover:bg-[#B85A10] text-white text-sm font-medium shadow-xl transition-all hover:-translate-y-0.5"
+                className="px-8 py-3.5 rounded-full bg-[#E87722] hover:bg-[#B85A10] text-white text-sm font-medium shadow-xl transition-all hover:-translate-y-0.5 glow-orange"
               >
                 Explore Portal →
               </Link>
               <a
                 href="#projects"
-                className="px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium transition-all"
+                className="px-8 py-3.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-medium transition-all backdrop-blur-sm"
               >
                 View Impact Projects
               </a>
             </div>
 
             <div className="grid grid-cols-3 gap-6 pt-8 border-t border-white/10">
-              <div>
+              <div className="animate-fade-up-delay-1">
                 <div className="text-3xl font-serif font-bold text-white">500+</div>
                 <div className="text-xs text-white/50 mt-1">Eco-homes Planned</div>
               </div>
-              <div>
+              <div className="animate-fade-up-delay-2">
                 <div className="text-3xl font-serif font-bold text-[#E87722]">2h</div>
                 <div className="text-xs text-white/50 mt-1">Maintenance SLA</div>
               </div>
-              <div>
+              <div className="animate-fade-up-delay-3">
                 <div className="text-3xl font-serif font-bold text-white">$4M+</div>
                 <div className="text-xs text-white/50 mt-1">Projects in Pipeline</div>
               </div>
             </div>
           </div>
 
-          <div id="calculator" className="flex justify-center lg:justify-end">
-            <EcoCalculator />
+          <div id="calculator" className="flex justify-center lg:justify-end animate-fade-up-delay-1">
+            <div className="relative">
+              <div className="absolute -inset-4 rounded-3xl bg-[#E87722]/10 blur-2xl pointer-events-none" />
+              <div className="relative animate-float">
+                <EcoCalculator />
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
 
       {/* 2. MARQUEE STRIP */}
       <section className="bg-[#E87722] text-white py-3.5 overflow-hidden shadow-inner">
@@ -181,6 +192,66 @@ export default function Home() {
               <span className="px-2.5 py-1 rounded-full bg-[#D4EFE6]/50 text-[#2E8B6A] text-[10px] font-medium">MTN MoMo Payout</span>
             </div>
             <Link href="/portal" className="text-xs font-semibold text-[#2E8B6A] hover:underline">View Dispatch Board →</Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 4.5 HOW IT WORKS (STEP FLOW) */}
+      <section className="py-20 px-6 md:px-12 bg-white border-y border-[#D8E4DC]">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <span className="text-xs font-semibold uppercase tracking-widest text-[#E87722] mb-2 block">
+              Simplified Operations
+            </span>
+            <h2 className="text-3xl md:text-5xl font-serif font-bold text-[#0F3D26] mb-4">
+              How Civitas Works
+            </h2>
+            <p className="text-sm text-[#6B7E72] leading-relaxed">
+              From Ghana Post GPS address verification to automated Mobile Money rent payouts and solar energy telemetry.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
+            {/* Connecting line on desktop */}
+            <div className="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-[#D6EDE1] -translate-y-6 z-0" />
+
+            {[
+              {
+                step: '01',
+                title: 'Digital Onboarding',
+                desc: 'Register properties with Ghana Post GPS digital address validation & land title verification.',
+                icon: '📍',
+              },
+              {
+                step: '02',
+                title: 'Rent & Escrow Vault',
+                desc: 'Collect rent via MTN MoMo or Telecel Cash with automatic 6-month Ghana Rent Act 220 escrow protection.',
+                icon: '💳',
+              },
+              {
+                step: '03',
+                title: 'Solar & SLA Dispatch',
+                desc: 'Monitor solar micro-grid yield and dispatch certified local artisans for 2-hour emergency repair SLAs.',
+                icon: '⚡',
+              },
+              {
+                step: '04',
+                title: 'Diaspora Yield Payout',
+                desc: 'Receive net owner dividends disbursed automatically to Mobile Money or Wise USD bank accounts.',
+                icon: '📈',
+              },
+            ].map((s, idx) => (
+              <div key={idx} className="bg-[#F5F9F6] p-6 rounded-3xl border border-[#D8E4DC] relative z-10 hover:shadow-lg transition-all hover:-translate-y-1">
+                <div className="flex justify-between items-center mb-4">
+                  <div className="w-10 h-10 rounded-2xl bg-[#D6EDE1] text-[#1A5C3A] text-xl flex items-center justify-center font-bold">
+                    {s.icon}
+                  </div>
+                  <span className="text-2xl font-serif font-bold text-[#E87722]">{s.step}</span>
+                </div>
+                <h3 className="text-base font-serif font-bold text-[#111A14] mb-2">{s.title}</h3>
+                <p className="text-xs text-[#6B7E72] leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>

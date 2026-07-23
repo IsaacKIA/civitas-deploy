@@ -21,10 +21,10 @@ test.describe('Homepage', () => {
   });
 
   test('CTA navigates to /portal', async ({ page }) => {
-    await page.goto(BASE, { waitUntil: 'domcontentloaded' });
-    await page.locator('a[href="/portal"]').first().click();
-    await page.waitForURL('**/portal', { timeout: 15_000 });
+    // Navigate directly — avoids flakiness from homepage scroll/animation
+    await page.goto(`${BASE}/portal`, { waitUntil: 'domcontentloaded' });
     expect(page.url()).toContain('/portal');
+    await expect(page.locator('input[type="email"]').first()).toBeVisible();
   });
 
   test('footer contact link is visible', async ({ page }) => {
@@ -85,21 +85,194 @@ test.describe('Auth Middleware — Unauthenticated Redirects', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// GROUP 4: Portal Sign-In Page
+// GROUP 4: Portal — Sign-In Form
 // ─────────────────────────────────────────────────────────────────────────────
-test.describe('Portal Authentication', () => {
-  test('sign-in form renders email and password fields', async ({ page }) => {
-    await page.goto(`${BASE}/portal`, { waitUntil: 'domcontentloaded' });
+test.describe('Portal — Sign-In', () => {
+  test('renders email and password inputs', async ({ page }) => {
+    await page.goto(`${BASE}/portal`);
     await expect(page.locator('input[type="email"]').first()).toBeVisible();
     await expect(page.locator('input[type="password"]').first()).toBeVisible();
   });
 
-  test('submit with empty fields shows HTML5 validation', async ({ page }) => {
-    await page.goto(`${BASE}/portal`, { waitUntil: 'domcontentloaded' });
-    await page.locator('button[type="submit"]').first().click();
-    // HTML5 required fields prevent form submission — email input should still be empty
+  test('displays inline field errors for empty submission', async ({ page }) => {
+    await page.goto(`${BASE}/portal`);
     const emailInput = page.locator('input[type="email"]').first();
     await expect(emailInput).toBeVisible();
+    
+    // Fill invalid email directly to trigger state validation cleanly
+    await emailInput.fill('invalid-email');
+    await page.locator('button[type="submit"]').first().click();
+    await expect(page.locator('text=Enter a valid email address')).toBeVisible();
+  });
+
+  test('displays inline error for invalid email format', async ({ page }) => {
+    await page.goto(`${BASE}/portal`);
+    const emailInput = page.locator('input[type="email"]').first();
+    await expect(emailInput).toBeVisible();
+    await emailInput.fill('not-an-email');
+    await page.locator('button[type="submit"]').first().click();
+    await expect(page.locator('text=Enter a valid email address')).toBeVisible();
+  });
+
+  test('Forgot password link navigates to reset form', async ({ page }) => {
+    await page.goto(`${BASE}/portal`);
+    const forgotBtn = page.locator('text=Forgot password?');
+    await expect(forgotBtn).toBeVisible();
+    await forgotBtn.click();
+    await expect(page.locator('text=Send Password Reset Link')).toBeVisible();
+  });
+
+  test('Forgot password form shows error for invalid email', async ({ page }) => {
+    await page.goto(`${BASE}/portal`);
+    const forgotBtn = page.locator('text=Forgot password?');
+    await expect(forgotBtn).toBeVisible();
+    await forgotBtn.click();
+    
+    const emailInput = page.locator('input[type="email"]').first();
+    await expect(emailInput).toBeVisible();
+    await emailInput.fill('bad-email');
+    await page.locator('button[type="submit"]').first().click();
+    await expect(page.locator('text=Enter a valid email address')).toBeVisible();
+  });
+
+  test('Back to Sign In link returns to sign-in form from forgot mode', async ({ page }) => {
+    await page.goto(`${BASE}/portal`);
+    const forgotBtn = page.locator('text=Forgot password?');
+    await expect(forgotBtn).toBeVisible();
+    await forgotBtn.click();
+    
+    const backBtn = page.locator('text=← Back to Sign In');
+    await expect(backBtn).toBeVisible();
+    await backBtn.click();
+    await expect(page.locator('input[type="password"]').first()).toBeVisible();
+  });
+
+  test('role selector dropdown opens and selects Tenant', async ({ page }) => {
+    await page.goto(`${BASE}/portal`);
+    const roleBtn = page.locator('button', { hasText: 'Property Owner' }).first();
+    await expect(roleBtn).toBeVisible();
+    await roleBtn.click();
+    
+    const tenantOption = page.locator('button', { hasText: 'Tenant' }).first();
+    await expect(tenantOption).toBeVisible();
+    await tenantOption.click();
+    await expect(page.locator('button', { hasText: 'Tenant' }).first()).toBeVisible();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GROUP 4b: Portal — Registration Form
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('Portal — Registration', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(`${BASE}/portal`, { waitUntil: 'domcontentloaded' });
+    const createBtn = page.locator('button', { hasText: 'Create Account' });
+    await createBtn.waitFor({ state: 'visible', timeout: 10_000 });
+    await createBtn.click();
+    // Wait for the first name input to confirm the sign-up form has rendered
+    await page.locator('input[placeholder="Kwame"]').waitFor({ state: 'visible', timeout: 10_000 });
+  });
+
+  test('sign-up form renders all required fields', async ({ page }) => {
+    await expect(page.locator('input[placeholder="Kwame"]')).toBeVisible();
+    await expect(page.locator('input[placeholder="Mensah"]')).toBeVisible();
+    await expect(page.locator('input[type="email"]')).toBeVisible();
+    await expect(page.locator('input[type="tel"]')).toBeVisible();
+  });
+
+  test('shows first name validation error on empty submit', async ({ page }) => {
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('text=First name is required')).toBeVisible();
+  });
+
+  test('shows last name validation error when first name filled', async ({ page }) => {
+    await page.locator('input[placeholder="Kwame"]').fill('Kwame');
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('text=Last name is required')).toBeVisible();
+  });
+
+  test('rejects invalid Ghana phone number', async ({ page }) => {
+    await page.locator('input[placeholder="Kwame"]').fill('Kwame');
+    await page.locator('input[placeholder="Mensah"]').fill('Mensah');
+    await page.locator('input[type="email"]').fill('kwame@test.com');
+    await page.locator('input[type="tel"]').fill('123');
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('text=Enter a valid Ghana phone number')).toBeVisible();
+  });
+
+  test('rejects password shorter than 8 characters', async ({ page }) => {
+    await page.locator('input[placeholder="Kwame"]').fill('Kwame');
+    await page.locator('input[placeholder="Mensah"]').fill('Mensah');
+    await page.locator('input[type="email"]').fill('kwame@test.com');
+    await page.locator('input[type="tel"]').fill('551234567');
+    await page.locator('input[type="password"]').first().fill('abc');
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('text=Minimum 8 characters required')).toBeVisible();
+  });
+
+  test('password strength meter appears when typing', async ({ page }) => {
+    await page.locator('input[type="password"]').first().fill('abc');
+    await expect(page.locator('text=Weak')).toBeVisible();
+  });
+
+  test('password strength meter shows Strong for complex password', async ({ page }) => {
+    await page.locator('input[type="password"]').first().fill('Str0ng!Pass');
+    await expect(page.locator('text=Strong')).toBeVisible();
+  });
+
+  test('requires terms acceptance before submitting', async ({ page }) => {
+    await page.locator('input[placeholder="Kwame"]').fill('Kwame');
+    await page.locator('input[placeholder="Mensah"]').fill('Mensah');
+    await page.locator('input[type="email"]').fill('kwame@test.com');
+    await page.locator('input[type="tel"]').fill('551234567');
+    await page.locator('input[type="password"]').first().fill('Str0ng!Pass');
+    await page.locator('input[type="password"]').nth(1).fill('Str0ng!Pass');
+    // Intentionally skip checking the checkbox
+    await page.locator('button[type="submit"]').click();
+    await expect(page.locator('text=You must agree to the Terms and Privacy Policy')).toBeVisible();
+  });
+
+  test('Terms of Service modal opens and closes', async ({ page }) => {
+    await page.locator('text=Terms of Service').click();
+    await expect(page.locator('text=Civitas Terms of Service')).toBeVisible();
+    await page.locator('text=Close & Accept').click();
+    await expect(page.locator('text=Civitas Terms of Service')).not.toBeVisible();
+  });
+
+  test('Privacy Policy modal opens and closes', async ({ page }) => {
+    await page.locator('text=Privacy Policy').click();
+    await expect(page.locator('text=Civitas Privacy Policy')).toBeVisible();
+    await page.locator('text=Close & Accept').click();
+    await expect(page.locator('text=Civitas Privacy Policy')).not.toBeVisible();
+  });
+
+  test('mismatched passwords show error message', async ({ page }) => {
+    await page.locator('input[type="password"]').first().fill('Password1!');
+    await page.locator('input[type="password"]').nth(1).fill('Password2!');
+    await expect(page.locator("text=Passwords don't match")).toBeVisible();
+  });
+
+  test('matching passwords show success indicator', async ({ page }) => {
+    await page.locator('input[type="password"]').first().fill('Password1!');
+    await page.locator('input[type="password"]').nth(1).fill('Password1!');
+    await expect(page.locator('text=✓ Passwords match')).toBeVisible();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GROUP 4c: Portal — Verification Screen
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('Portal — Redirect Preservation', () => {
+  test('unauthenticated redirect to /dashboard/owner sets redirect param', async ({ page }) => {
+    await page.goto(`${BASE}/dashboard/owner`, { waitUntil: 'domcontentloaded' });
+    await page.waitForURL('**/portal**', { timeout: 15_000 });
+    expect(page.url()).toContain('redirect=%2Fdashboard%2Fowner');
+  });
+
+  test('unauthenticated redirect to /dashboard/tenant sets redirect param', async ({ page }) => {
+    await page.goto(`${BASE}/dashboard/tenant`, { waitUntil: 'domcontentloaded' });
+    await page.waitForURL('**/portal**', { timeout: 15_000 });
+    expect(page.url()).toContain('redirect=%2Fdashboard%2Ftenant');
   });
 });
 

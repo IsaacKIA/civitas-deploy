@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
 type Role = 'client' | 'tenant' | 'investor' | 'technician';
-type AuthMode = 'signin' | 'signup' | 'verify';
+type AuthMode = 'signin' | 'signup' | 'verify' | 'forgot';
 
 const ROLES: { id: Role; emoji: string; label: string; description: string }[] = [
   { id: 'client',     emoji: '🏠', label: 'Property Owner', description: 'Manage estates, rentals & energy' },
@@ -58,6 +58,11 @@ export default function PortalPage() {
   const [showRoles, setShowRoles] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // Modals & Timers
+  const [showTermsModal, setShowTermsModal] = useState<string | null>(null);
+  const [resendTimer, setResendTimer] = useState(0);
+  const [resendStatus, setResendStatus] = useState<string | null>(null);
+
   // Sign-in
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
@@ -70,13 +75,29 @@ export default function PortalPage() {
   const [phone, setPhone]           = useState('');
   const [suPass, setSuPass]         = useState('');
   const [suConfirm, setSuConfirm]   = useState('');
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [suErrors, setSuErrors]     = useState<Record<string, string>>({});
+
+  // Forgot password
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotSent, setForgotSent]   = useState(false);
+  const [forgotError, setForgotError] = useState('');
 
   const activeRole = ROLES.find(r => r.id === role)!;
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendTimer > 0) {
+      interval = setInterval(() => {
+        setResendTimer(t => t - 1);
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer]);
+
   // ─── Validation helpers ─────────────────────────────────────────────────────
   const validateEmail = (v: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? '' : 'Enter a valid email address';
-  const validatePhone = (v: string) => /^[0-9]{9,10}$/.test(v.replace(/\s/g,'')) ? '' : 'Enter a valid Ghana number (9-10 digits)';
+  const validatePhone = (v: string) => /^[0-9]{9,10}$/.test(v.replace(/\s/g,'')) ? '' : 'Enter a valid Ghana phone number (9-10 digits)';
 
   // ─── Sign In ────────────────────────────────────────────────────────────────
   const handleSignIn = async (e: React.FormEvent) => {
@@ -93,9 +114,10 @@ export default function PortalPage() {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) { setSiErrors({ general: error.message }); return; }
       if (data.session) {
-        // Get role from user metadata and redirect
         const userRole = (data.user?.user_metadata?.role as Role) || role;
-        window.location.href = DASHBOARD_ROUTES[userRole];
+        const searchParams = new URLSearchParams(window.location.search);
+        const redirectPath = searchParams.get('redirect');
+        window.location.href = redirectPath || DASHBOARD_ROUTES[userRole];
       }
     } catch {
       setSiErrors({ general: 'Connection error. Please try again.' });
@@ -114,8 +136,9 @@ export default function PortalPage() {
     if (emailErr) errors.email = emailErr;
     const phoneErr = validatePhone(phone);
     if (phoneErr) errors.phone = phoneErr;
-    if (suPass.length < 8)         errors.password = 'Minimum 8 characters';
+    if (suPass.length < 8)         errors.password = 'Minimum 8 characters required';
     if (suPass !== suConfirm)      errors.confirm  = 'Passwords do not match';
+    if (!acceptedTerms)            errors.terms    = 'You must agree to the Terms and Privacy Policy';
     if (Object.keys(errors).length) { setSuErrors(errors); return; }
     setSuErrors({});
     setLoading(true);
@@ -133,9 +156,54 @@ export default function PortalPage() {
         }
       });
       if (error) { setSuErrors({ general: error.message }); return; }
+      setResendTimer(60);
       setMode('verify');
     } catch {
       setSuErrors({ general: 'Connection error. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ─── Resend Email ───────────────────────────────────────────────────────────
+  const handleResendEmail = async () => {
+    if (resendTimer > 0) return;
+    setLoading(true);
+    setResendStatus(null);
+    try {
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email: suEmail,
+      });
+      if (error) {
+        setResendStatus(`Error: ${error.message}`);
+      } else {
+        setResendStatus('Verification email resent successfully!');
+        setResendTimer(60);
+      }
+    } catch {
+      setResendStatus('Failed to resend. Please check your connection.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ─── Forgot Password ────────────────────────────────────────────────────────
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const emailErr = validateEmail(forgotEmail);
+    if (emailErr) { setForgotError(emailErr); return; }
+    setForgotError('');
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
+        redirectTo: `${window.location.origin}/portal?mode=reset`,
+      });
+      if (error) { setForgotError(error.message); return; }
+      setForgotSent(true);
+    } catch {
+      setForgotError('Connection error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -148,6 +216,39 @@ export default function PortalPage() {
 
   return (
     <div className="min-h-screen bg-[#0F3D26] flex flex-col items-center justify-center p-6 relative overflow-hidden">
+
+      {/* Terms / Privacy Modal */}
+      {showTermsModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-lg w-full max-h-[80vh] overflow-y-auto shadow-2xl">
+            <h3 className="text-xl font-serif font-bold text-[#0F3D26] mb-3">
+              {showTermsModal === 'terms' ? 'Civitas Terms of Service' : 'Civitas Privacy Policy'}
+            </h3>
+            <div className="text-xs text-[#6B7E72] space-y-3 leading-relaxed border-t border-b border-[#D8E4DC] py-4">
+              <p>
+                Welcome to Civitas PropTech v2.0. By accessing or using our platform, you agree to be bound by our terms governing property management, rent transactions, solar energy tracking, and account security.
+              </p>
+              <p>
+                <strong>1. Account Responsibilities:</strong> Users must provide accurate profile details and safeguard credentials. Duplicate account creations are strictly audited.
+              </p>
+              <p>
+                <strong>2. Data Protection:</strong> All user records, financial payloads, and property document data are encrypted at rest and strictly controlled under Row Level Security protocols.
+              </p>
+              <p>
+                <strong>3. Service Scope:</strong> Civitas complies with local digital transaction regulations including Ghana Rent Act compliance and mobile money integration rules.
+              </p>
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                onClick={() => setShowTermsModal(null)}
+                className="px-6 py-2 bg-[#1A5C3A] text-white text-xs font-semibold rounded-full hover:bg-[#2E7D52] transition-all"
+              >
+                Close & Accept
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 px-6 py-5 flex justify-between items-center z-20 max-w-7xl mx-auto w-full">
@@ -170,7 +271,7 @@ export default function PortalPage() {
             Civitas<span className="text-[#E87722]">.</span>
           </Link>
           <p className="text-xs text-[#6B7E72] mb-5">
-            {mode === 'signin' ? 'Welcome back! Sign in to continue.' : mode === 'signup' ? 'Create your free Civitas account.' : ''}
+            {mode === 'signin' ? 'Welcome back! Sign in to continue.' : mode === 'signup' ? 'Create your free Civitas account.' : mode === 'forgot' ? 'Reset your account password.' : ''}
           </p>
           {mode !== 'verify' && (
             <div className="inline-flex rounded-full bg-[#F5F9F6] border border-[#D8E4DC] p-1 gap-1">
@@ -182,16 +283,84 @@ export default function PortalPage() {
 
         {/* EMAIL VERIFY STATE */}
         {mode === 'verify' && (
-          <div className="px-8 py-14 text-center">
+          <div className="px-8 py-10 text-center">
             <div className="w-16 h-16 rounded-full bg-[#EEF7F2] text-3xl flex items-center justify-center mx-auto mb-4">📧</div>
             <h3 className="text-2xl font-serif font-bold text-[#0F3D26] mb-2">Check your email</h3>
             <p className="text-xs text-[#6B7E72] mb-2">
-              We sent a verification link to <span className="font-semibold text-[#111A14]">{suEmail}</span>.
+              We sent a verification link to <span className="font-semibold text-[#111A14]">{suEmail || 'your email address'}</span>.
             </p>
-            <p className="text-xs text-[#6B7E72] mb-8">Click the link to activate your account, then sign in.</p>
-            <button onClick={() => setMode('signin')} className="w-full py-3 rounded-full bg-[#1A5C3A] hover:bg-[#2E7D52] text-white text-xs font-semibold uppercase tracking-wider transition-all">
-              Go to Sign In →
-            </button>
+            <p className="text-xs text-[#6B7E72] mb-6">Click the link to activate your account, then sign in.</p>
+
+            {resendStatus && (
+              <p className={`text-xs mb-4 ${resendStatus.startsWith('Error') || resendStatus.startsWith('Failed') ? 'text-[#D94F3D]' : 'text-[#1A5C3A] font-medium'}`}>
+                {resendStatus}
+              </p>
+            )}
+
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handleResendEmail}
+                disabled={resendTimer > 0 || loading}
+                className="w-full py-3 rounded-full border border-[#1A5C3A] text-[#1A5C3A] hover:bg-[#EEF7F2] disabled:opacity-50 text-xs font-semibold uppercase tracking-wider transition-all"
+              >
+                {resendTimer > 0 ? `Resend Link (${resendTimer}s)` : loading ? 'Resending…' : 'Resend Verification Email'}
+              </button>
+              <button onClick={() => setMode('signin')} className="w-full py-3 rounded-full bg-[#1A5C3A] hover:bg-[#2E7D52] text-white text-xs font-semibold uppercase tracking-wider transition-all">
+                Go to Sign In →
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* FORGOT PASSWORD STATE */}
+        {mode === 'forgot' && (
+          <div className="px-8 py-6">
+            {forgotSent ? (
+              <div className="text-center py-6">
+                <div className="w-14 h-14 rounded-full bg-[#EEF7F2] text-2xl flex items-center justify-center mx-auto mb-3">🔑</div>
+                <h3 className="text-xl font-serif font-bold text-[#0F3D26] mb-2">Reset link sent!</h3>
+                <p className="text-xs text-[#6B7E72] mb-6">
+                  Check <span className="font-semibold text-[#111A14]">{forgotEmail}</span> for instructions to reset your password.
+                </p>
+                <button onClick={() => { setForgotSent(false); setMode('signin'); }} className="w-full py-3 rounded-full bg-[#1A5C3A] text-white text-xs font-semibold uppercase tracking-wider">
+                  Return to Sign In →
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleForgotPassword} className="space-y-4" noValidate>
+                <p className="text-xs text-[#6B7E72] mb-2">
+                  Enter your registered email address and we will send you a password reset link.
+                </p>
+                {forgotError && (
+                  <div className="px-4 py-3 rounded-xl bg-[#FDECEA] border border-[#D94F3D]/30 text-xs text-[#D94F3D]">
+                    ⚠ {forgotError}
+                  </div>
+                )}
+                <div>
+                  <label className="block text-xs font-semibold text-[#111A14] mb-1.5">Email Address</label>
+                  <input
+                    type="email"
+                    value={forgotEmail}
+                    onChange={e => setForgotEmail(e.target.value)}
+                    placeholder="you@civitasestate.com"
+                    className={inputCls(forgotError)}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-full bg-[#1A5C3A] hover:bg-[#2E7D52] disabled:opacity-60 text-white text-xs font-semibold uppercase tracking-wider transition-all"
+                >
+                  {loading ? 'Sending Reset Link…' : 'Send Password Reset Link →'}
+                </button>
+                <div className="text-center">
+                  <button type="button" onClick={() => setMode('signin')} className="text-xs text-[#1A5C3A] font-semibold hover:underline">
+                    ← Back to Sign In
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         )}
 
@@ -236,7 +405,7 @@ export default function PortalPage() {
               <div>
                 <div className="flex justify-between items-center mb-1.5">
                   <label className="text-xs font-semibold text-[#111A14]">Password</label>
-                  <button type="button" className="text-[10px] text-[#1A5C3A] hover:underline font-medium">Forgot password?</button>
+                  <button type="button" onClick={() => setMode('forgot')} className="text-[10px] text-[#1A5C3A] hover:underline font-medium">Forgot password?</button>
                 </div>
                 <input type="password" value={password} onChange={e => { setPassword(e.target.value); setSiErrors(p => ({...p, password: ''})); }}
                   placeholder="••••••••" className={inputCls(siErrors.password)} />
@@ -324,17 +493,32 @@ export default function PortalPage() {
                 <div>
                   <label className="block text-xs font-semibold text-[#111A14] mb-1.5">Confirm</label>
                   <input type="password" value={suConfirm} onChange={e => { setSuConfirm(e.target.value); setSuErrors(p => ({...p, confirm: ''})); }}
-                    placeholder="••••••••" className={inputCls(suErrors.confirm)} />
+                    placeholder="••••••••" className={inputCls(suConfirm && suPass !== suConfirm ? 'err' : '')} />
                   {suConfirm && suPass !== suConfirm && <FieldError msg="Passwords don't match" />}
                   {suConfirm && suPass === suConfirm && suConfirm.length > 0 && <p className="text-[10px] text-[#1A5C3A] mt-1">✓ Passwords match</p>}
                 </div>
               </div>
 
-              <p className="text-[10px] text-[#6B7E72] leading-relaxed">
-                By creating an account you agree to Civitas&apos;{' '}
-                <span className="text-[#1A5C3A] font-semibold cursor-pointer hover:underline">Terms of Service</span>{' '}and{' '}
-                <span className="text-[#1A5C3A] font-semibold cursor-pointer hover:underline">Privacy Policy</span>.
-              </p>
+              <div className="space-y-1">
+                <label className="flex items-start gap-2 cursor-pointer mt-1">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={e => { setAcceptedTerms(e.target.checked); setSuErrors(p => ({...p, terms: ''})); }}
+                    className="mt-0.5 rounded border-[#D8E4DC] text-[#1A5C3A] focus:ring-[#1A5C3A]"
+                  />
+                  <span className="text-[10px] text-[#6B7E72] leading-relaxed">
+                    I agree to Civitas&apos;{' '}
+                    <button type="button" onClick={() => setShowTermsModal('terms')} className="text-[#1A5C3A] font-semibold underline">
+                      Terms of Service
+                    </button>{' '}and{' '}
+                    <button type="button" onClick={() => setShowTermsModal('privacy')} className="text-[#1A5C3A] font-semibold underline">
+                      Privacy Policy
+                    </button>.
+                  </span>
+                </label>
+                <FieldError msg={suErrors.terms || ''} />
+              </div>
 
               <button type="submit" disabled={loading}
                 className="w-full py-3.5 rounded-full bg-[#E87722] hover:bg-[#B85A10] disabled:opacity-60 text-white text-xs font-semibold uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2">

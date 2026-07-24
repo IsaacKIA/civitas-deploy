@@ -58,10 +58,11 @@ export default function PortalPage() {
   const [showRoles, setShowRoles] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Modals & Timers
+  // Modals, Timers & Banners
   const [showTermsModal, setShowTermsModal] = useState<string | null>(null);
   const [resendTimer, setResendTimer] = useState(0);
   const [resendStatus, setResendStatus] = useState<string | null>(null);
+  const [urlBanner, setUrlBanner] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   // Sign-in
   const [email, setEmail]       = useState('');
@@ -84,6 +85,24 @@ export default function PortalPage() {
   const [forgotError, setForgotError] = useState('');
 
   const activeRole = ROLES.find(r => r.id === role)!;
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('verified') === 'true') {
+        setUrlBanner({
+          type: 'success',
+          message: 'Your email address has been verified! You can now sign in.',
+        });
+        setMode('signin');
+      } else if (params.get('error')) {
+        setUrlBanner({
+          type: 'error',
+          message: decodeURIComponent(params.get('error')!),
+        });
+      }
+    }
+  }, []);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -144,10 +163,12 @@ export default function PortalPage() {
     setLoading(true);
 
     try {
+      const redirectUrl = `${window.location.origin}/auth/callback`;
       const { error } = await supabase.auth.signUp({
         email: suEmail,
         password: suPass,
         options: {
+          emailRedirectTo: redirectUrl,
           data: {
             full_name: `${firstName.trim()} ${lastName.trim()}`,
             phone: `+233${phone.replace(/\s/g,'')}`,
@@ -171,9 +192,13 @@ export default function PortalPage() {
     setLoading(true);
     setResendStatus(null);
     try {
+      const redirectUrl = `${window.location.origin}/auth/callback`;
       const { error } = await supabase.auth.resend({
         type: 'signup',
         email: suEmail,
+        options: {
+          emailRedirectTo: redirectUrl,
+        }
       });
       if (error) {
         setResendStatus(`Error: ${error.message}`);
@@ -273,6 +298,14 @@ export default function PortalPage() {
           <p className="text-xs text-[#6B7E72] mb-5">
             {mode === 'signin' ? 'Welcome back! Sign in to continue.' : mode === 'signup' ? 'Create your free Civitas account.' : mode === 'forgot' ? 'Reset your account password.' : ''}
           </p>
+
+          {urlBanner && (
+            <div className={`mb-5 px-4 py-3 rounded-2xl text-xs flex items-center justify-between text-left ${urlBanner.type === 'success' ? 'bg-[#EEF7F2] text-[#1A5C3A] border border-[#1A5C3A]/20' : 'bg-[#FDECEA] text-[#D94F3D] border border-[#D94F3D]/20'}`}>
+              <span>{urlBanner.type === 'success' ? '✓ ' : '⚠ '}{urlBanner.message}</span>
+              <button onClick={() => setUrlBanner(null)} className="ml-2 text-xs font-bold opacity-60 hover:opacity-100">✕</button>
+            </div>
+          )}
+
           {mode !== 'verify' && (
             <div className="inline-flex rounded-full bg-[#F5F9F6] border border-[#D8E4DC] p-1 gap-1">
               <button onClick={() => setMode('signin')} className={`px-5 py-2 rounded-full text-xs font-semibold transition-all ${mode === 'signin' ? 'bg-[#1A5C3A] text-white shadow' : 'text-[#6B7E72] hover:text-[#111A14]'}`}>Sign In</button>

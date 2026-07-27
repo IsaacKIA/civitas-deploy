@@ -164,7 +164,7 @@ export default function PortalPage() {
 
     try {
       const redirectUrl = `${window.location.origin}/auth/callback`;
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email: suEmail,
         password: suPass,
         options: {
@@ -176,7 +176,29 @@ export default function PortalPage() {
           }
         }
       });
-      if (error) { setSuErrors({ general: error.message }); return; }
+
+      if (error) {
+        let msg = error.message;
+        if (!msg || msg === '{}' || error.status === 500) {
+          msg = 'Verification email service error (HTTP 500). Please verify custom SMTP settings in your Supabase Auth dashboard or try again later.';
+        }
+        setSuErrors({ general: msg });
+        return;
+      }
+
+      // If user session is returned immediately, email confirmation is disabled on Supabase
+      if (data?.session) {
+        const userRole = (data.user?.user_metadata?.role as Role) || role;
+        window.location.href = DASHBOARD_ROUTES[userRole];
+        return;
+      }
+
+      // Check if user identity already exists (Supabase returns empty identities array when identity protection is enabled)
+      if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+        setSuErrors({ general: 'An account with this email address already exists. Please sign in.' });
+        return;
+      }
+
       setResendTimer(60);
       setMode('verify');
     } catch {
@@ -201,7 +223,11 @@ export default function PortalPage() {
         }
       });
       if (error) {
-        setResendStatus(`Error: ${error.message}`);
+        let msg = error.message;
+        if (!msg || msg === '{}' || error.status === 500) {
+          msg = 'Failed to resend email (HTTP 500). SMTP provider issue.';
+        }
+        setResendStatus(`Error: ${msg}`);
       } else {
         setResendStatus('Verification email resent successfully!');
         setResendTimer(60);

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServiceRoleClient } from '@/lib/supabase/server';
+import { renderVerificationEmail } from '@/lib/email-templates';
+
 
 /**
  * POST /api/auth/resend-verification
@@ -62,34 +64,11 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         from: 'Civitas Estate <admin@civitasestate.com>',
         to: [email],
-        subject: 'Confirm your Civitas Estate account',
-        html: `
-          <div style="font-family:Inter,sans-serif;max-width:520px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #D8E4DC">
-            <div style="background:#0F3D26;padding:32px 40px;text-align:center">
-              <h1 style="color:#fff;font-size:28px;margin:0;letter-spacing:-0.5px">
-                Civitas<span style="color:#E87722">.</span>
-              </h1>
-              <p style="color:rgba(255,255,255,0.6);font-size:13px;margin:8px 0 0">PropTech Platform</p>
-            </div>
-            <div style="padding:40px">
-              <h2 style="color:#0F3D26;font-size:22px;margin:0 0 12px">Verify your email address</h2>
-              <p style="color:#4A5D50;font-size:14px;line-height:1.6;margin:0 0 28px">
-                Thank you for signing up to Civitas Estate. Click the button below to verify your email address and activate your account.
-              </p>
-              <a href="${verificationLink}" style="display:inline-block;background:#1A5C3A;color:#fff;text-decoration:none;padding:14px 32px;border-radius:999px;font-size:13px;font-weight:600;letter-spacing:0.5px">
-                Verify Email Address &rarr;
-              </a>
-              <p style="color:#9CA3AF;font-size:11px;margin:28px 0 0;line-height:1.6">
-                This link expires in 24 hours. If you did not create a Civitas account, you can safely ignore this email.
-              </p>
-            </div>
-            <div style="background:#F5F9F6;padding:20px 40px;text-align:center;border-top:1px solid #D8E4DC">
-              <p style="color:#9CA3AF;font-size:11px;margin:0">
-                &copy; ${year} Civitas Estate &middot; Ghana
-              </p>
-            </div>
-          </div>
-        `,
+        subject: 'Welcome to Civitas — Confirm your account',
+        html: renderVerificationEmail({
+          name: email.split('@')[0],
+          confirmUrl: verificationLink,
+        }),
       }),
     });
 

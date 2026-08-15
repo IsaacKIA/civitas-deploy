@@ -21,7 +21,7 @@ export default async function OwnerDashboard() {
   const [{ data: properties, error: propertiesError }, { data: leases, error: leasesError }] = await Promise.all([
     supabase
       .from('properties')
-      .select('id, name, status, monthly_rent, has_solar, leases(status, profiles:tenant_id(full_name))')
+      .select('id, name, status, monthly_rent, has_solar, leases(status, tenant:profiles!tenant_id(full_name))')
       .eq('owner_id', auth.user.id)
       .order('created_at', { ascending: false }),
     supabase
@@ -30,7 +30,11 @@ export default async function OwnerDashboard() {
       .eq('owner_id', auth.user.id),
   ]);
 
+  if (propertiesError) console.error('[OwnerDashboard] propertiesError:', propertiesError);
+  if (leasesError) console.error('[OwnerDashboard] leasesError:', leasesError);
+
   const hasError = !!propertiesError || !!leasesError;
+
 
   const totalProperties = properties?.length ?? 0;
   const occupiedCount = properties?.filter((p) => p.status === 'active').length ?? 0;

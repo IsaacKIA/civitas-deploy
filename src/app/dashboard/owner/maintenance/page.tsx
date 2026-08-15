@@ -20,9 +20,10 @@ export default async function OwnerMaintenancePage() {
   const supabase = await createSupabaseServerClient();
   const { data: requests, error } = await supabase
     .from('maintenance_requests')
-    .select('id, reference_code, category, priority, title, status, created_at, sla_hours, properties(name), profiles:tenant_id(full_name), technician:technician_id(full_name)')
+    .select('id, category, priority, title, status, created_at, properties(name), tenant:profiles!tenant_id(full_name)')
     .eq('owner_id', auth.user.id)
     .order('created_at', { ascending: false });
+
 
   return (
     <DashboardLayout role="owner" userName={auth.profile.full_name}>

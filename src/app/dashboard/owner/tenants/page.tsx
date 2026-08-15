@@ -18,10 +18,11 @@ export default async function OwnerTenantsPage() {
   const supabase = await createSupabaseServerClient();
   const { data: leases, error } = await supabase
     .from('leases')
-    .select('id, status, monthly_rent_ghs, start_date, end_date, properties(name), profiles:tenant_id(full_name, email)')
+    .select('id, status, monthly_rent_ghs, start_date, end_date, properties(name), tenant:profiles!tenant_id(full_name, email)')
     .eq('owner_id', auth.user.id)
     .in('status', ['pending_first_payment', 'active'])
     .order('created_at', { ascending: false });
+
 
   return (
     <DashboardLayout role="owner" userName={auth.profile.full_name}>

@@ -25,9 +25,10 @@ export default async function OwnerDocumentsPage() {
       .order('created_at', { ascending: false }),
     supabase
       .from('leases')
-      .select('id, status, created_at, properties(name), profiles:tenant_id(full_name)')
+      .select('id, status, created_at, properties(name), tenant:profiles!tenant_id(full_name)')
       .eq('owner_id', auth.user.id)
       .order('created_at', { ascending: false }),
+
     supabase.from('properties').select('id, name').eq('owner_id', auth.user.id).order('created_at', { ascending: false }),
   ]);
 

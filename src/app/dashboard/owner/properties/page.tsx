@@ -20,10 +20,11 @@ export default async function PropertiesDirectoryPage() {
   const { data: properties, error } = await supabase
     .from('properties')
     .select(
-      'id, name, property_type, status, monthly_rent, ghana_post_gps, solar_capacity_kwp, has_solar, leases(id, status, tenant_id, profiles:tenant_id(full_name))'
+      'id, name, property_type, status, monthly_rent, ghana_post_gps, solar_capacity_kwp, has_solar, leases(id, status, tenant_id, tenant:profiles!tenant_id(full_name))'
     )
     .eq('owner_id', auth.user.id)
     .order('created_at', { ascending: false });
+
 
   return (
     <DashboardLayout role="owner" userName={auth.profile.full_name}>

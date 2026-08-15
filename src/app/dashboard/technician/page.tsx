@@ -19,9 +19,10 @@ export default async function TechnicianDashboard() {
   const supabase = await createSupabaseServerClient();
   const { data: jobs, error } = await supabase
     .from('maintenance_requests')
-    .select('id, reference_code, category, priority, title, description, status, created_at, sla_hours, properties(name, address, ghana_post_gps), profiles:tenant_id(full_name)')
+    .select('id, reference_code, category, priority, title, description, status, created_at, sla_hours, properties(name, address, ghana_post_gps), tenant:profiles!tenant_id(full_name)')
     .eq('technician_id', auth.user.id)
     .order('created_at', { ascending: false });
+
 
   const activeJobs = (jobs ?? []).filter((j) => j.status === 'assigned' || j.status === 'in_progress');
   const completedJobs = (jobs ?? []).filter((j) => j.status === 'completed');

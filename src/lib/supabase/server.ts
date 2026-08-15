@@ -105,9 +105,72 @@ export async function getAuthedProfile() {
     .eq('id', user.id)
     .single();
 
-  if (profileError || !profile) {
-    return null;
+  if (!profileError && profile) {
+    return {
+      user,
+      profile: profile as {
+        id: string;
+        organization_id: string;
+        role: AppRole;
+        full_name: string;
+        email: string;
+      },
+    };
   }
 
-  return { user, profile: profile as { id: string; organization_id: string; role: AppRole; full_name: string; email: string } };
+  // Auto-heal: If profile row is missing (e.g. database trigger didn't run or table empty),
+  // construct a valid profile from user metadata so the user can immediately access their dashboard.
+  const role = (user.user_metadata?.role as AppRole) || 'client';
+  const fullName =
+    (user.user_metadata?.full_name as string) ||
+    user.email?.split('@')[0] ||
+    'User';
+  const email = user.email || '';
+
+  // Attempt to write the missing profile into public.profiles using service role client
+  try {
+    const serviceClient = createSupabaseServiceRoleClient();
+    const { data: newProfile } = await serviceClient
+      .from('profiles')
+      .upsert(
+        {
+          id: user.id,
+          role,
+          full_name: fullName,
+          email,
+          organization_id: crypto.randomUUID(),
+        },
+        { onConflict: 'id' }
+      )
+      .select('id, organization_id, role, full_name, email')
+      .single();
+
+    if (newProfile) {
+      return {
+        user,
+        profile: newProfile as {
+          id: string;
+          organization_id: string;
+          role: AppRole;
+          full_name: string;
+          email: string;
+        },
+      };
+    }
+  } catch (err) {
+    console.warn('[getAuthedProfile] Auto-heal profile write skipped:', err);
+  }
+
+  // In-memory fallback if database write fails
+  return {
+    user,
+    profile: {
+      id: user.id,
+      organization_id: user.id,
+      role,
+      full_name: fullName,
+      email,
+    },
+  };
 }
+

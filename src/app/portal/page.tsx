@@ -104,6 +104,8 @@ function PortalPageInner() {
   };
 
   // ─── Sign Up ────────────────────────────────────────────────────────────────
+  const [resendStatus, setResendStatus] = useState<string | null>(null);
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     const errors: Record<string, string> = {};
@@ -120,10 +122,14 @@ function PortalPageInner() {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ||
+        (typeof window !== 'undefined' ? window.location.origin : '');
+      const redirectTo = siteUrl ? `${siteUrl}/auth/callback` : undefined;
+      const { data, error } = await supabase.auth.signUp({
         email: suEmail,
         password: suPass,
         options: {
+          emailRedirectTo: redirectTo,
           data: {
             full_name: `${firstName.trim()} ${lastName.trim()}`,
             phone: `+233${phone.replace(/\s/g,'')}`,
@@ -132,6 +138,13 @@ function PortalPageInner() {
         }
       });
       if (error) { setSuErrors({ general: error.message }); return; }
+      
+      // If email confirmation is disabled in Supabase project, session will be returned immediately
+      if (data.session) {
+        window.location.href = ROLE_HOME_ROUTE[role];
+        return;
+      }
+      
       setMode('verify');
     } catch {
       setSuErrors({ general: 'Connection error. Please try again.' });
@@ -139,6 +152,30 @@ function PortalPageInner() {
       setLoading(false);
     }
   };
+
+  const handleResendEmail = async () => {
+    if (!suEmail) return;
+    setLoading(true);
+    setResendStatus(null);
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: suEmail }),
+      });
+      const json = await res.json();
+      if (!res.ok || json.error) {
+        setResendStatus(`Resend failed: ${json.error ?? 'Unknown error'}`);
+      } else {
+        setResendStatus('Verification email resent! Please check your Inbox and Spam folder.');
+      }
+    } catch {
+      setResendStatus('Failed to resend email. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const inputCls = (err?: string) =>
     `w-full px-4 py-3 text-xs rounded-xl border outline-none transition-all ${
@@ -181,16 +218,46 @@ function PortalPageInner() {
 
         {/* EMAIL VERIFY STATE */}
         {mode === 'verify' && (
-          <div className="px-8 py-14 text-center">
+          <div className="px-8 py-10 text-center">
             <div className="w-16 h-16 rounded-full bg-[#EEF7F2] text-3xl flex items-center justify-center mx-auto mb-4">📧</div>
             <h3 className="text-2xl font-serif font-bold text-[#0F3D26] mb-2">Check your email</h3>
             <p className="text-xs text-[#6B7E72] mb-2">
               We sent a verification link to <span className="font-semibold text-[#111A14]">{suEmail}</span>.
             </p>
-            <p className="text-xs text-[#6B7E72] mb-8">Click the link to activate your account, then sign in.</p>
-            <button onClick={() => setMode('signin')} className="w-full py-3 rounded-full bg-[#1A5C3A] hover:bg-[#2E7D52] text-white text-xs font-semibold uppercase tracking-wider transition-all">
-              Go to Sign In →
-            </button>
+            <p className="text-xs text-[#6B7E72] mb-4">Click the link in the email to activate your account.</p>
+
+            <div className="bg-[#F5F9F6] border border-[#D8E4DC] rounded-xl p-3.5 text-[11px] text-[#4A5D50] text-left mb-6 space-y-1">
+              <p className="font-semibold text-[#0F3D26]">💡 Not seeing the email?</p>
+              <ul className="list-disc pl-4 space-y-0.5 text-[#6B7E72]">
+                <li>Check your <strong>Spam / Junk</strong> folder (especially for Yahoo & Gmail).</li>
+                <li>Ensure <code>{suEmail || 'your email'}</code> was entered correctly.</li>
+                <li>Verify your domain's SMTP settings if using a custom mail server.</li>
+              </ul>
+            </div>
+
+            {resendStatus && (
+              <p className={`text-xs mb-4 font-medium ${resendStatus.includes('failed') ? 'text-[#D94F3D]' : 'text-[#1A5C3A]'}`}>
+                {resendStatus}
+              </p>
+            )}
+
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handleResendEmail}
+                disabled={loading}
+                className="w-full py-3 rounded-full border border-[#1A5C3A] text-[#1A5C3A] hover:bg-[#EEF7F2] text-xs font-semibold uppercase tracking-wider transition-all disabled:opacity-50"
+              >
+                {loading ? 'Sending...' : 'Resend Verification Email'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('signin')}
+                className="w-full py-3 rounded-full bg-[#1A5C3A] hover:bg-[#2E7D52] text-white text-xs font-semibold uppercase tracking-wider transition-all"
+              >
+                Go to Sign In →
+              </button>
+            </div>
           </div>
         )}
 

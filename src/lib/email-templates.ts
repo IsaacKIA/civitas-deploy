@@ -1,6 +1,6 @@
 /**
- * Civitas Estate Management — Email Templates Library
- * High-deliverability inline-styled transactional HTML emails.
+ * Civitas Estate Management — Email Templates & Sender Library
+ * High-deliverability inline-styled transactional HTML emails for Ghana PropTech.
  */
 
 const BASE_STYLES = {
@@ -14,10 +14,11 @@ const BASE_STYLES = {
   buttonContainer: `text-align: center; margin: 32px 0;`,
   button: `display: inline-block; background-color: #1A5C3A; color: #ffffff !important; text-decoration: none; font-size: 13px; font-weight: 600; padding: 14px 34px; border-radius: 9999px; letter-spacing: 0.2px; text-align: center; box-shadow: 0 2px 8px rgba(26, 92, 58, 0.25);`,
   subtext: `font-size: 12px; color: #788A7F; line-height: 1.5; margin: 24px 0 0;`,
-  card: `background-color: #F5F9F6; border: 1px solid #E2ECE5; border-radius: 16px; padding: 20px 24px; margin: 24px 0;`,
-  cardRow: `display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #EAF2EC; font-size: 13px;`,
-  cardLabel: `color: #6B7E72; font-weight: 500;`,
-  cardValue: `color: #111A14; font-weight: 600; text-align: right;`,
+  card: `width: 100%; background-color: #F5F9F6; border: 1px solid #E2ECE5; border-radius: 16px; padding: 18px 22px; margin: 24px 0; border-collapse: collapse;`,
+  cardLabel: `padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500; border-bottom: 1px solid #EAF2EC;`,
+  cardValue: `padding: 9px 0; color: #111A14; font-size: 13px; font-weight: 600; text-align: right; border-bottom: 1px solid #EAF2EC;`,
+  cardLabelLast: `padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500;`,
+  cardValueLast: `padding: 9px 0; color: #111A14; font-size: 13px; font-weight: 600; text-align: right;`,
   footer: `background-color: #F8FAF9; padding: 24px 36px; border-top: 1px solid #EBF1ED; font-size: 11px; color: #788A7F; line-height: 1.6;`,
   footerLink: `color: #1A5C3A; text-decoration: underline; font-weight: 600;`,
 };
@@ -127,25 +128,25 @@ export function renderPaymentReceivedEmail({
         Hi ${tenantName}, we've confirmed your ${paymentType.toLowerCase()} payment for <strong>${propertyName}</strong>.
       </p>
 
-      <table style="width: 100%; background-color: #F5F9F6; border: 1px solid #E2ECE5; border-radius: 16px; padding: 18px 22px; margin: 24px 0; border-collapse: collapse;">
+      <table style="${BASE_STYLES.card}">
         <tr>
-          <td style="padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500; border-bottom: 1px solid #EAF2EC;">Amount</td>
+          <td style="${BASE_STYLES.cardLabel}">Amount</td>
           <td style="padding: 9px 0; color: #0F3D26; font-size: 16px; font-weight: 700; text-align: right; border-bottom: 1px solid #EAF2EC;">${formattedAmount}</td>
         </tr>
         <tr>
-          <td style="padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500; border-bottom: 1px solid #EAF2EC;">Property</td>
-          <td style="padding: 9px 0; color: #111A14; font-size: 13px; font-weight: 600; text-align: right; border-bottom: 1px solid #EAF2EC;">${propertyName}</td>
+          <td style="${BASE_STYLES.cardLabel}">Property</td>
+          <td style="${BASE_STYLES.cardValue}">${propertyName}</td>
         </tr>
         <tr>
-          <td style="padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500; border-bottom: 1px solid #EAF2EC;">Payment Type</td>
-          <td style="padding: 9px 0; color: #111A14; font-size: 13px; font-weight: 600; text-align: right; border-bottom: 1px solid #EAF2EC;">${paymentType}</td>
+          <td style="${BASE_STYLES.cardLabel}">Payment Type</td>
+          <td style="${BASE_STYLES.cardValue}">${paymentType}</td>
         </tr>
         <tr>
-          <td style="padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500; border-bottom: 1px solid #EAF2EC;">Date</td>
-          <td style="padding: 9px 0; color: #111A14; font-size: 13px; font-weight: 600; text-align: right; border-bottom: 1px solid #EAF2EC;">${formattedDate}</td>
+          <td style="${BASE_STYLES.cardLabel}">Date</td>
+          <td style="${BASE_STYLES.cardValue}">${formattedDate}</td>
         </tr>
         <tr>
-          <td style="padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500;">Reference</td>
+          <td style="${BASE_STYLES.cardLabelLast}">Reference</td>
           <td style="padding: 9px 0; color: #111A14; font-size: 13px; font-family: monospace; font-weight: 600; text-align: right;">${reference}</td>
         </tr>
       </table>
@@ -204,7 +205,7 @@ export function renderJobAssignedEmail({
         Hi ${technicianName}, you've been assigned a <strong>⚠️ ${priority}</strong> maintenance request.
       </p>
 
-      <table style="width: 100%; background-color: #F5F9F6; border: 1px solid #E2ECE5; border-radius: 16px; padding: 20px 22px; margin: 24px 0; border-collapse: collapse;">
+      <table style="${BASE_STYLES.card}">
         <tr>
           <td colspan="2" style="padding-bottom: 12px; border-bottom: 1px solid #EAF2EC;">
             <div style="font-size: 11px; font-weight: 700; color: #0F3D26; font-family: monospace; text-transform: uppercase; margin-bottom: 4px;">${referenceCode}</div>
@@ -212,19 +213,19 @@ export function renderJobAssignedEmail({
           </td>
         </tr>
         <tr>
-          <td style="padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500; border-bottom: 1px solid #EAF2EC;">Property</td>
-          <td style="padding: 9px 0; color: #111A14; font-size: 13px; font-weight: 600; text-align: right; border-bottom: 1px solid #EAF2EC;">${propertyName}</td>
+          <td style="${BASE_STYLES.cardLabel}">Property</td>
+          <td style="${BASE_STYLES.cardValue}">${propertyName}</td>
         </tr>
         <tr>
-          <td style="padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500; border-bottom: 1px solid #EAF2EC;">Address</td>
-          <td style="padding: 9px 0; color: #111A14; font-size: 13px; font-weight: 600; text-align: right; border-bottom: 1px solid #EAF2EC;">${address}</td>
+          <td style="${BASE_STYLES.cardLabel}">Address</td>
+          <td style="${BASE_STYLES.cardValue}">${address}</td>
         </tr>
         <tr>
-          <td style="padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500; border-bottom: 1px solid #EAF2EC;">Category</td>
-          <td style="padding: 9px 0; color: #111A14; font-size: 13px; font-weight: 600; text-align: right; border-bottom: 1px solid #EAF2EC;">${category}</td>
+          <td style="${BASE_STYLES.cardLabel}">Category</td>
+          <td style="${BASE_STYLES.cardValue}">${category}</td>
         </tr>
         <tr>
-          <td style="padding: 9px 0; color: #6B7E72; font-size: 13px; font-weight: 500;">Response Target</td>
+          <td style="${BASE_STYLES.cardLabelLast}">Response Target</td>
           <td style="padding: 9px 0; color: #E87722; font-size: 14px; font-weight: 700; text-align: right;">${responseTarget}</td>
         </tr>
       </table>
@@ -240,4 +241,247 @@ export function renderJobAssignedEmail({
 </body>
 </html>
   `;
+}
+
+/**
+ * 4. New Lease Agreement Invitation (To Tenant)
+ */
+export function renderLeaseInviteEmail({
+  tenantName = 'Tenant',
+  landlordName = 'Your Landlord',
+  propertyName,
+  monthlyRentGhs,
+  advanceMonths = 6,
+  leaseUrl = 'https://www.civitasestate.com/dashboard/tenant/lease',
+}: {
+  tenantName?: string;
+  landlordName?: string;
+  propertyName: string;
+  monthlyRentGhs: number | string;
+  advanceMonths?: number;
+  leaseUrl?: string;
+}) {
+  const formattedRent = typeof monthlyRentGhs === 'number' ? `GHS ${monthlyRentGhs.toLocaleString()}` : `GHS ${monthlyRentGhs}`;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lease Agreement Ready</title>
+</head>
+<body style="margin: 0; padding: 24px 12px; background-color: #EDF3EF;">
+  <div style="${BASE_STYLES.container}">
+    ${renderHeader()}
+    <div style="${BASE_STYLES.body}">
+      <h2 style="${BASE_STYLES.heading}">Lease Agreement Ready</h2>
+      <p style="${BASE_STYLES.paragraph}">
+        Hi ${tenantName}, ${landlordName} has created a new Ghana Rent Act 220 compliant lease agreement for <strong>${propertyName}</strong>.
+      </p>
+
+      <table style="${BASE_STYLES.card}">
+        <tr>
+          <td style="${BASE_STYLES.cardLabel}">Property</td>
+          <td style="${BASE_STYLES.cardValue}">${propertyName}</td>
+        </tr>
+        <tr>
+          <td style="${BASE_STYLES.cardLabel}">Monthly Rent</td>
+          <td style="padding: 9px 0; color: #0F3D26; font-size: 15px; font-weight: 700; text-align: right; border-bottom: 1px solid #EAF2EC;">${formattedRent} / mo</td>
+        </tr>
+        <tr>
+          <td style="${BASE_STYLES.cardLabel}">Advance Terms</td>
+          <td style="${BASE_STYLES.cardValue}">${advanceMonths} Months (Legal Escrow)</td>
+        </tr>
+        <tr>
+          <td style="${BASE_STYLES.cardLabelLast}">Escrow Protection</td>
+          <td style="padding: 9px 0; color: #1A5C3A; font-size: 13px; font-weight: 600; text-align: right;">Ghana Rent Act 220 Protected ✓</td>
+        </tr>
+      </table>
+
+      <div style="${BASE_STYLES.buttonContainer}">
+        <a href="${leaseUrl}" target="_blank" style="${BASE_STYLES.button}">
+          Review & Accept Lease →
+        </a>
+      </div>
+    </div>
+    ${renderFooter()}
+  </div>
+</body>
+</html>
+  `;
+}
+
+/**
+ * 5. Rent Due Reminder Email (Rent Act 220 Escrow)
+ */
+export function renderRentDueReminderEmail({
+  tenantName = 'Tenant',
+  propertyName,
+  amountGhs,
+  dueDate,
+  paymentUrl = 'https://www.civitasestate.com/dashboard/tenant/rent',
+}: {
+  tenantName?: string;
+  propertyName: string;
+  amountGhs: number | string;
+  dueDate: string;
+  paymentUrl?: string;
+}) {
+  const formattedAmount = typeof amountGhs === 'number' ? `GHS ${amountGhs.toLocaleString()}` : `GHS ${amountGhs}`;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rent Payment Reminder</title>
+</head>
+<body style="margin: 0; padding: 24px 12px; background-color: #EDF3EF;">
+  <div style="${BASE_STYLES.container}">
+    ${renderHeader()}
+    <div style="${BASE_STYLES.body}">
+      <h2 style="${BASE_STYLES.heading}">Upcoming Rent Payment</h2>
+      <p style="${BASE_STYLES.paragraph}">
+        Hi ${tenantName}, this is a friendly reminder that your rent installment for <strong>${propertyName}</strong> is due on <strong>${dueDate}</strong>.
+      </p>
+
+      <table style="${BASE_STYLES.card}">
+        <tr>
+          <td style="${BASE_STYLES.cardLabel}">Amount Due</td>
+          <td style="padding: 9px 0; color: #0F3D26; font-size: 16px; font-weight: 700; text-align: right; border-bottom: 1px solid #EAF2EC;">${formattedAmount}</td>
+        </tr>
+        <tr>
+          <td style="${BASE_STYLES.cardLabel}">Due Date</td>
+          <td style="padding: 9px 0; color: #E87722; font-size: 13px; font-weight: 700; text-align: right; border-bottom: 1px solid #EAF2EC;">${dueDate}</td>
+        </tr>
+        <tr>
+          <td style="${BASE_STYLES.cardLabelLast}">Payment Methods</td>
+          <td style="${BASE_STYLES.cardValueLast}">MTN MoMo · Telecel · Card</td>
+        </tr>
+      </table>
+
+      <div style="${BASE_STYLES.buttonContainer}">
+        <a href="${paymentUrl}" target="_blank" style="${BASE_STYLES.button}">
+          Pay Rent via Mobile Money →
+        </a>
+      </div>
+    </div>
+    ${renderFooter()}
+  </div>
+</body>
+</html>
+  `;
+}
+
+/**
+ * 6. Maintenance Request Resolved Email
+ */
+export function renderMaintenanceResolvedEmail({
+  recipientName = 'there',
+  referenceCode,
+  title,
+  propertyName,
+  technicianName = 'Assigned Technician',
+  dashboardUrl = 'https://www.civitasestate.com/dashboard',
+}: {
+  recipientName?: string;
+  referenceCode: string;
+  title: string;
+  propertyName: string;
+  technicianName?: string;
+  dashboardUrl?: string;
+}) {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maintenance Request Completed</title>
+</head>
+<body style="margin: 0; padding: 24px 12px; background-color: #EDF3EF;">
+  <div style="${BASE_STYLES.container}">
+    ${renderHeader()}
+    <div style="${BASE_STYLES.body}">
+      <h2 style="${BASE_STYLES.heading}">Issue Resolved ✓</h2>
+      <p style="${BASE_STYLES.paragraph}">
+        Hi ${recipientName}, the maintenance request for <strong>${propertyName}</strong> has been completed by ${technicianName}.
+      </p>
+
+      <table style="${BASE_STYLES.card}">
+        <tr>
+          <td style="${BASE_STYLES.cardLabel}">Ticket Code</td>
+          <td style="padding: 9px 0; color: #111A14; font-family: monospace; font-size: 13px; font-weight: 700; text-align: right; border-bottom: 1px solid #EAF2EC;">${referenceCode}</td>
+        </tr>
+        <tr>
+          <td style="${BASE_STYLES.cardLabel}">Issue</td>
+          <td style="${BASE_STYLES.cardValue}">${title}</td>
+        </tr>
+        <tr>
+          <td style="${BASE_STYLES.cardLabel}">Property</td>
+          <td style="${BASE_STYLES.cardValue}">${propertyName}</td>
+        </tr>
+        <tr>
+          <td style="${BASE_STYLES.cardLabelLast}">Status</td>
+          <td style="padding: 9px 0; color: #1A5C3A; font-size: 13px; font-weight: 700; text-align: right;">Completed ✓</td>
+        </tr>
+      </table>
+
+      <div style="${BASE_STYLES.buttonContainer}">
+        <a href="${dashboardUrl}" target="_blank" style="${BASE_STYLES.button}">
+          View Maintenance Status →
+        </a>
+      </div>
+    </div>
+    ${renderFooter()}
+  </div>
+</body>
+</html>
+  `;
+}
+
+/**
+ * Universal Resend Email Dispatch Helper
+ */
+export async function sendBrandedEmail({
+  to,
+  subject,
+  html,
+}: {
+  to: string | string[];
+  subject: string;
+  html: string;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.error('[sendBrandedEmail] RESEND_API_KEY is not set');
+    return { error: 'RESEND_API_KEY missing' };
+  }
+
+  const recipients = Array.isArray(to) ? to : [to];
+
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: 'Civitas Estate <admin@civitasestate.com>',
+      to: recipients,
+      subject,
+      html,
+    }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    console.error('[sendBrandedEmail] Resend API error:', errorData);
+    return { error: errorData };
+  }
+
+  const data = await res.json();
+  return { success: true, data };
 }

@@ -2,6 +2,7 @@
 
 import React, { Suspense, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ROLE_HOME_ROUTE } from '@/lib/section-roles';
@@ -190,7 +191,12 @@ function PortalPageInner() {
         <Link href="/" className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-semibold transition-all hover:-translate-x-0.5">
           ← Back to Homepage
         </Link>
-        <span className="text-white/40 text-xs font-mono uppercase tracking-widest hidden sm:inline">Civitas PropTech v2.0</span>
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center p-0.5 overflow-hidden">
+            <Image src="/brand/civitas-mark.png" alt="Civitas" width={20} height={20} className="w-full h-full object-contain" />
+          </div>
+          <span className="text-white/60 text-xs font-mono uppercase tracking-widest hidden sm:inline">Civitas Estate & Maintenance</span>
+        </div>
       </header>
 
       {/* Background */}
@@ -202,8 +208,15 @@ function PortalPageInner() {
 
         {/* Card Header */}
         <div className="px-8 pt-8 pb-6 text-center border-b border-[#D8E4DC]">
-          <Link href="/" className="inline-block text-3xl font-serif font-bold text-[#0F3D26] mb-1">
-            Civitas<span className="text-[#E87722]">.</span>
+          <Link href="/" className="inline-flex flex-col items-center mb-2 group">
+            <Image
+              src="/brand/civitas-logo-tight.png"
+              alt="Civitas Estate and Maintenance"
+              width={160}
+              height={140}
+              className="h-24 w-auto object-contain transition-transform group-hover:scale-105"
+              priority
+            />
           </Link>
           <p className="text-xs text-[#6B7E72] mb-5">
             {mode === 'signin' ? 'Welcome back! Sign in to continue.' : mode === 'signup' ? 'Create your free Civitas account.' : ''}

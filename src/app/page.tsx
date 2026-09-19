@@ -8,6 +8,7 @@ import TrustBadges from '@/components/TrustBadges';
 import LocationsGrid from '@/components/LocationsGrid';
 import FAQSection from '@/components/FAQSection';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -533,8 +534,16 @@ export default function Home() {
       <footer className="bg-[#111A14] text-white/60 py-16 px-6 md:px-12 border-t border-white/10">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
           <div>
-            <Link href="/" className="text-2xl font-serif font-bold text-white mb-3 block">
-              Civitas<span className="text-[#E87722]">.</span>
+            <Link href="/" className="inline-block mb-4 group">
+              <div className="bg-white p-2.5 rounded-2xl inline-block shadow-md transition-transform group-hover:scale-105">
+                <Image
+                  src="/brand/civitas-logo-tight.png"
+                  alt="Civitas Estate and Maintenance"
+                  width={150}
+                  height={130}
+                  className="h-20 w-auto object-contain"
+                />
+              </div>
             </Link>
             <p className="text-xs leading-relaxed text-white/50">
               Rent Act compliant property management for Ghana. Smart Living. Sustainable Legacy.

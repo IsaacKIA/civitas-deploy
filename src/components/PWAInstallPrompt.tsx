@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -44,8 +45,8 @@ export default function PWAInstallPrompt() {
   return (
     <div className="fixed bottom-20 right-6 z-50 max-w-sm bg-[#0F3D26] text-white p-4 rounded-2xl border border-white/20 shadow-2xl flex items-center justify-between gap-4 animate-in slide-in-from-bottom-5">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#E87722] flex items-center justify-center text-xl font-bold">
-          📱
+        <div className="w-10 h-10 rounded-xl bg-white p-0.5 flex items-center justify-center overflow-hidden shadow-xs shrink-0">
+          <Image src="/brand/civitas-mark.png" alt="Civitas App" width={36} height={36} className="w-full h-full object-contain" />
         </div>
         <div>
           <div className="font-serif font-bold text-xs">Install Civitas App</div>

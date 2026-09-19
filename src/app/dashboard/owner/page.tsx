@@ -148,7 +148,7 @@ export default async function OwnerDashboard() {
                   {properties!.slice(0, 6).map((p) => {
                     const activeLease = (p.leases ?? []).find((l) => l.status === 'active' || l.status === 'pending_first_payment');
                     const tenant = activeLease
-                      ? Array.isArray(activeLease.profiles) ? activeLease.profiles[0] : activeLease.profiles
+                      ? Array.isArray(activeLease.tenant) ? activeLease.tenant[0] : activeLease.tenant
                       : null;
                     return (
                       <tr key={p.id} className="hover:bg-[#F5F9F6] transition-colors">

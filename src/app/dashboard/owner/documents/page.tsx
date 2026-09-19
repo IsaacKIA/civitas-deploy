@@ -53,7 +53,7 @@ export default async function OwnerDocumentsPage() {
           status: l.status,
           createdAt: l.created_at,
           propertyName: (Array.isArray(l.properties) ? l.properties[0] : l.properties)?.name ?? 'Property',
-          tenantName: (Array.isArray(l.profiles) ? l.profiles[0] : l.profiles)?.full_name ?? null,
+          tenantName: (Array.isArray(l.tenant) ? l.tenant[0] : l.tenant)?.full_name ?? null,
         }))}
         hasError={!!docsError || !!leasesError}
       />

@@ -51,7 +51,7 @@ export default async function OwnerTenantsPage() {
             <div className="divide-y divide-[#D8E4DC]">
               {leases.map((lease) => {
                 const property = Array.isArray(lease.properties) ? lease.properties[0] : lease.properties;
-                const tenant = Array.isArray(lease.profiles) ? lease.profiles[0] : lease.profiles;
+                const tenant = Array.isArray(lease.tenant) ? lease.tenant[0] : lease.tenant;
                 return (
                   <div key={lease.id} className="py-4 flex items-center justify-between text-xs">
                     <div>

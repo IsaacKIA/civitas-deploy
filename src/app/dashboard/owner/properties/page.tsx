@@ -66,7 +66,7 @@ export default async function PropertiesDirectoryPage() {
           {properties.map((p) => {
             const activeLease = (p.leases ?? []).find((l) => l.status === 'active' || l.status === 'pending_first_payment');
             const tenantProfile = activeLease
-              ? Array.isArray(activeLease.profiles) ? activeLease.profiles[0] : activeLease.profiles
+              ? Array.isArray(activeLease.tenant) ? activeLease.tenant[0] : activeLease.tenant
               : null;
 
             return (

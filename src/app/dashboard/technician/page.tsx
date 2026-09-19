@@ -50,7 +50,7 @@ export default async function TechnicianDashboard() {
           <div className="bg-white rounded-3xl border border-[#D8E4DC] shadow-sm divide-y divide-[#D8E4DC]">
             {activeJobs.map((job) => {
               const property = Array.isArray(job.properties) ? job.properties[0] : job.properties;
-              const tenant = Array.isArray(job.profiles) ? job.profiles[0] : job.profiles;
+              const tenant = Array.isArray(job.tenant) ? job.tenant[0] : job.tenant;
               const category = MAINTENANCE_CATEGORIES.find((c) => c.id === job.category);
               const priority = MAINTENANCE_PRIORITIES.find((p) => p.id === job.priority);
               return (

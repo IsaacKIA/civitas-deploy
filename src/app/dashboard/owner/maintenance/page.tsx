@@ -20,7 +20,7 @@ export default async function OwnerMaintenancePage() {
   const supabase = await createSupabaseServerClient();
   const { data: requests, error } = await supabase
     .from('maintenance_requests')
-    .select('id, category, priority, title, status, created_at, properties(name), tenant:profiles!tenant_id(full_name)')
+    .select('id, category, priority, title, status, created_at, reference_code, properties(name), tenant:profiles!tenant_id(full_name)')
     .eq('owner_id', auth.user.id)
     .order('created_at', { ascending: false });
 
@@ -59,8 +59,8 @@ export default async function OwnerMaintenancePage() {
           <div className="divide-y divide-[#D8E4DC]">
             {requests.map((r) => {
               const property = Array.isArray(r.properties) ? r.properties[0] : r.properties;
-              const tenant = Array.isArray(r.profiles) ? r.profiles[0] : r.profiles;
-              const technician = Array.isArray(r.technician) ? r.technician[0] : r.technician;
+              const tenant = Array.isArray(r.tenant) ? r.tenant[0] : r.tenant;
+              const technician = (r as any).technician ? (Array.isArray((r as any).technician) ? (r as any).technician[0] : (r as any).technician) : null;
               const category = MAINTENANCE_CATEGORIES.find((c) => c.id === r.category);
               const priority = MAINTENANCE_PRIORITIES.find((p) => p.id === r.priority);
               return (

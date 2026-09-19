@@ -62,7 +62,10 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true },
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon.png", sizes: "64x64", type: "image/png" },
+      { url: "/favicon.ico" }
+    ],
     apple: "/apple-touch-icon.png",
   },
 };

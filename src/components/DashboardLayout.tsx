@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 interface NavItem { label: string; href: string; icon: string; }
@@ -112,8 +113,24 @@ export default function DashboardLayout({ children, role, userName = 'User' }: D
     <div className="flex flex-col h-full">
       {/* Logo */}
       <div className="px-6 py-5 border-b border-[#D8E4DC]">
-        <Link href="/" className="text-xl font-serif font-bold text-[#0F3D26]">
-          Civitas<span className="text-[#E87722]">.</span>
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-xs border border-[#D8E4DC] overflow-hidden p-0.5 shrink-0 group-hover:scale-105 transition-transform">
+            <Image
+              src="/brand/civitas-mark.png"
+              alt="Civitas Logo"
+              width={36}
+              height={36}
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <div>
+            <div className="text-lg font-serif font-bold text-[#0F3D26] leading-none">
+              Civitas<span className="text-[#E87722]">.</span>
+            </div>
+            <div className="text-[8px] uppercase tracking-wider font-semibold text-[#6B7E72] mt-0.5">
+              Estate & Maintenance
+            </div>
+          </div>
         </Link>
         <div className="mt-3 flex items-center gap-2.5 px-3 py-2.5 rounded-xl" style={{ background: meta.bg }}>
           <span className="text-lg">{meta.emoji}</span>

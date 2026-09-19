@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
@@ -37,9 +38,25 @@ export default function Navbar() {
         }`}
       >
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-1 text-2xl font-bold font-serif tracking-tight">
-          <span className={scrolled ? 'text-[#0F3D26]' : 'text-white'}>Civitas</span>
-          <span className="text-[#E87722]">.</span>
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-xs border border-[#D8E4DC]/50 overflow-hidden p-0.5 shrink-0 transition-transform group-hover:scale-105">
+            <Image
+              src="/brand/civitas-mark.png"
+              alt="Civitas Estate and Maintenance Logo"
+              width={36}
+              height={36}
+              className="w-full h-full object-contain"
+              priority
+            />
+          </div>
+          <div className="flex flex-col">
+            <span className={`text-xl font-bold font-serif tracking-tight leading-none ${scrolled ? 'text-[#0F3D26]' : 'text-white'}`}>
+              Civitas<span className="text-[#E87722]">.</span>
+            </span>
+            <span className={`text-[8px] uppercase tracking-wider font-semibold font-sans mt-0.5 ${scrolled ? 'text-[#6B7E72]' : 'text-white/80'}`}>
+              Estate & Maintenance
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Links */}
@@ -92,9 +109,25 @@ export default function Navbar() {
           {/* Drawer */}
           <div className="absolute top-0 right-0 h-full w-72 bg-white shadow-2xl flex flex-col">
             <div className="flex items-center justify-between px-6 h-16 border-b border-[#D8E4DC]">
-              <span className="text-xl font-serif font-bold text-[#0F3D26]">
-                Civitas<span className="text-[#E87722]">.</span>
-              </span>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-xs border border-[#D8E4DC] overflow-hidden p-0.5 shrink-0">
+                  <Image
+                    src="/brand/civitas-mark.png"
+                    alt="Civitas Logo"
+                    width={28}
+                    height={28}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-lg font-serif font-bold text-[#0F3D26] leading-none">
+                    Civitas<span className="text-[#E87722]">.</span>
+                  </span>
+                  <span className="text-[8px] uppercase tracking-wider font-semibold text-[#6B7E72] mt-0.5">
+                    Estate & Maintenance
+                  </span>
+                </div>
+              </div>
               <button
                 onClick={() => setMenuOpen(false)}
                 className="w-8 h-8 rounded-full bg-[#F5F9F6] flex items-center justify-center text-[#6B7E72] hover:text-[#111A14]"

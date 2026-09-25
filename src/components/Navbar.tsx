@@ -23,8 +23,10 @@ export default function Navbar() {
 
   const links = [
     { label: 'Services',        href: '/#services' },
+    { label: 'Locations',       href: '/#locations' },
     { label: 'How It Works',    href: '/#how-it-works' },
     { label: 'Why Civitas',     href: '/#why' },
+    { label: 'FAQs',            href: '/#faq' },
     { label: 'Contact',         href: '/#contact' },
   ];
 

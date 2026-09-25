@@ -6,9 +6,20 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: '*',
         allow: ['/', '/portal'],
-        disallow: ['/dashboard/'],
+        disallow: [
+          '/dashboard/',
+          '/api/',
+          '/_next/',
+          '/static/',
+        ],
+      },
+      {
+        userAgent: 'Googlebot',
+        allow: ['/', '/portal'],
+        disallow: ['/dashboard/', '/api/'],
       },
     ],
     sitemap: 'https://civitasestate.com/sitemap.xml',
+    host: 'https://civitasestate.com',
   };
 }

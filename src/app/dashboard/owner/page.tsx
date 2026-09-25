@@ -2,6 +2,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import Link from 'next/link';
 import { createSupabaseServerClient, getAuthedProfile } from '@/lib/supabase/server';
 import { PROPERTY_STATUS_LABEL, PROPERTY_STATUS_STYLE, type PropertyStatus } from '@/lib/property-status';
+import { CurrencyAmount } from '@/components/CurrencyToggle';
 
 export default async function OwnerDashboard() {
   const auth = await getAuthedProfile();
@@ -62,7 +63,7 @@ export default async function OwnerDashboard() {
     },
     {
       label: 'Rent Collected',
-      value: `GHS ${rentCollectedThisMonth.toLocaleString()}`,
+      value: <CurrencyAmount amountGhs={rentCollectedThisMonth} />,
       sub: 'This month',
       icon: '💰',
       bg: '#FEF3C7',
@@ -156,7 +157,9 @@ export default async function OwnerDashboard() {
                           <div className="font-semibold text-[#111A14]">{p.name}</div>
                         </td>
                         <td className="px-4 py-3 text-[#3D5044]">{tenant?.full_name ?? '—'}</td>
-                        <td className="px-4 py-3 font-semibold text-[#1A5C3A]">GHS {Number(p.monthly_rent).toLocaleString()}</td>
+                        <td className="px-4 py-3 font-semibold text-[#1A5C3A]">
+                          <CurrencyAmount amountGhs={Number(p.monthly_rent)} />
+                        </td>
                         <td className="px-4 py-3">
                           <span className={`px-2.5 py-1 rounded-full text-[10px] font-semibold ${PROPERTY_STATUS_STYLE[p.status as PropertyStatus] ?? ''}`}>
                             {PROPERTY_STATUS_LABEL[p.status as PropertyStatus] ?? p.status}

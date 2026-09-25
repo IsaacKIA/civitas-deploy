@@ -40,6 +40,14 @@ export default async function OwnerFinancesPage() {
           <h1 className="text-2xl font-serif font-bold text-[#0F3D26]">Financial Statements & Payouts</h1>
           <p className="text-xs text-[#6B7E72] mt-1">Rent Act 220 compliant escrow schedule and property P&L</p>
         </div>
+        <a
+          href="/api/reports/financials"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#D8E4DC] text-xs font-semibold text-[#064E3B] hover:bg-[#F5F9F6] transition-all shrink-0"
+        >
+          📥 Download Report (PDF)
+        </a>
       </div>
 
       {/* Real escrow / rent schedule ledger */}

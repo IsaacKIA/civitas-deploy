@@ -322,60 +322,133 @@ export default function Home() {
       {/* 6. LOCATIONS FOOTPRINT */}
       <LocationsGrid />
 
-      {/* 7. WHO IT'S FOR */}
+      {/* 7. WHO IT'S FOR — All 5 Target Segments */}
       <section className="py-24 px-6 md:px-12 max-w-7xl mx-auto">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <span className="text-xs font-semibold uppercase tracking-widest text-[#E87722] mb-2 block">
-            Get Started
+            Who We Serve
           </span>
           <h2 className="text-3xl md:text-5xl font-serif font-bold text-[#0F3D26]">
-            Built For Everyone In the Lease
+            One Platform. Every Property Need.
           </h2>
+          <p className="text-sm text-[#6B7E72] mt-4 leading-relaxed max-w-xl mx-auto">
+            Whether you own a home in Accra, run a business in Kumasi, or manage properties from abroad —
+            Civitas coordinates the maintenance, payments, and oversight so you don&apos;t have to chase anyone.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-white rounded-3xl border border-[#D8E4DC] p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col">
-            <span className="text-3xl mb-4">🏠</span>
-            <h3 className="text-lg font-serif font-bold text-[#111A14] mb-2">Property Owners</h3>
-            <p className="text-xs text-[#6B7E72] leading-relaxed mb-6 flex-1">
-              Register a property, invite your tenant, and get a Rent Act compliant payment schedule generated
-              automatically — no spreadsheets, no guessing what&apos;s legal to charge.
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* 1 — Homeowners / Landlords */}
+          <div className="bg-white rounded-3xl border border-[#D8E4DC] p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col group">
+            <div className="w-12 h-12 rounded-2xl bg-[#EEF7F2] text-[#1A5C3A] flex items-center justify-center text-2xl mb-5">🏠</div>
+            <h3 className="text-lg font-serif font-bold text-[#111A14] mb-1">Homeowners &amp; Landlords</h3>
+            <p className="text-[11px] font-semibold text-[#E87722] uppercase tracking-wide mb-3">Residential Property Owners</p>
+            <ul className="text-xs text-[#6B7E72] leading-relaxed space-y-1.5 mb-6 flex-1">
+              <li className="flex gap-2"><span className="text-[#1A5C3A] font-bold">✓</span> Rent Act 220 compliant payment schedules — no guessing what&apos;s legal</li>
+              <li className="flex gap-2"><span className="text-[#1A5C3A] font-bold">✓</span> Maintenance tracked from request to completion, not just assigned</li>
+              <li className="flex gap-2"><span className="text-[#1A5C3A] font-bold">✓</span> Inspection reports and maintenance history in one place</li>
+              <li className="flex gap-2"><span className="text-[#1A5C3A] font-bold">✓</span> MTN MoMo, Telecel Cash &amp; AT Money payments</li>
+            </ul>
             <Link
               href="/portal?mode=signup&role=client"
-              className="text-xs font-semibold text-[#1A5C3A] hover:underline"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-[#1A5C3A] hover:underline group-hover:gap-3 transition-all"
             >
               Register a Property →
             </Link>
           </div>
 
-          <div className="bg-white rounded-3xl border border-[#D8E4DC] p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col">
-            <span className="text-3xl mb-4">🔑</span>
-            <h3 className="text-lg font-serif font-bold text-[#111A14] mb-2">Tenants</h3>
-            <p className="text-xs text-[#6B7E72] leading-relaxed mb-6 flex-1">
-              See exactly what you owe and when, pay by Mobile Money in a few taps, and log a maintenance issue
-              without chasing anyone down.
-            </p>
+          {/* 2 — SMEs */}
+          <div className="bg-white rounded-3xl border border-[#D8E4DC] p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col group">
+            <div className="w-12 h-12 rounded-2xl bg-[#EFF6FF] text-[#1E40AF] flex items-center justify-center text-2xl mb-5">🏢</div>
+            <h3 className="text-lg font-serif font-bold text-[#111A14] mb-1">Businesses &amp; SMEs</h3>
+            <p className="text-[11px] font-semibold text-[#1E40AF] uppercase tracking-wide mb-3">Commercial Premises Managers</p>
+            <ul className="text-xs text-[#6B7E72] leading-relaxed space-y-1.5 mb-6 flex-1">
+              <li className="flex gap-2"><span className="text-[#1E40AF] font-bold">✓</span> Premises reliability — electrical, plumbing, HVAC, cleaning</li>
+              <li className="flex gap-2"><span className="text-[#1E40AF] font-bold">✓</span> Security coordination and access management</li>
+              <li className="flex gap-2"><span className="text-[#1E40AF] font-bold">✓</span> Energy monitoring and solar solutions for your site</li>
+              <li className="flex gap-2"><span className="text-[#1E40AF] font-bold">✓</span> VAT receipts and invoice records for your accounts</li>
+            </ul>
             <Link
-              href="/portal?mode=signup&role=tenant"
-              className="text-xs font-semibold text-[#1A5C3A] hover:underline"
+              href="/portal?mode=signup&role=sme_owner"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-[#1E40AF] hover:underline group-hover:gap-3 transition-all"
             >
-              Find Your Lease →
+              Register Your Business →
             </Link>
           </div>
 
-          <div className="bg-white rounded-3xl border border-[#D8E4DC] p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col">
-            <span className="text-3xl mb-4">🔧</span>
-            <h3 className="text-lg font-serif font-bold text-[#111A14] mb-2">Technicians</h3>
-            <p className="text-xs text-[#6B7E72] leading-relaxed mb-6 flex-1">
-              Get assigned real jobs from property owners, see the full request up front, and mark work
-              complete when it&apos;s actually done.
-            </p>
+          {/* 3 — Institutions */}
+          <div className="bg-white rounded-3xl border border-[#D8E4DC] p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col group">
+            <div className="w-12 h-12 rounded-2xl bg-[#F0FDF4] text-[#16A34A] flex items-center justify-center text-2xl mb-5">🏛️</div>
+            <h3 className="text-lg font-serif font-bold text-[#111A14] mb-1">Institutions</h3>
+            <p className="text-[11px] font-semibold text-[#16A34A] uppercase tracking-wide mb-3">Schools, Hospitals &amp; Corporate Facilities</p>
+            <ul className="text-xs text-[#6B7E72] leading-relaxed space-y-1.5 mb-6 flex-1">
+              <li className="flex gap-2"><span className="text-[#16A34A] font-bold">✓</span> Scheduled preventive maintenance — generators, HVAC, fire systems</li>
+              <li className="flex gap-2"><span className="text-[#16A34A] font-bold">✓</span> Asset registers and compliance documentation store</li>
+              <li className="flex gap-2"><span className="text-[#16A34A] font-bold">✓</span> Multi-user facility management with approval workflows</li>
+              <li className="flex gap-2"><span className="text-[#16A34A] font-bold">✓</span> SLA tracking — see Civitas&apos;s own response performance</li>
+            </ul>
             <Link
-              href="/portal?mode=signup&role=technician"
-              className="text-xs font-semibold text-[#1A5C3A] hover:underline"
+              href="/portal?mode=signup&role=institution_admin"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-[#16A34A] hover:underline group-hover:gap-3 transition-all"
             >
-              Join as a Technician →
+              Access Institutional Portal →
+            </Link>
+          </div>
+
+          {/* 4 — Developers */}
+          <div className="bg-white rounded-3xl border border-[#D8E4DC] p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col group">
+            <div className="w-12 h-12 rounded-2xl bg-[#F5F3FF] text-[#7C3AED] flex items-center justify-center text-2xl mb-5">🏗️</div>
+            <h3 className="text-lg font-serif font-bold text-[#111A14] mb-1">Developers &amp; Estate Agents</h3>
+            <p className="text-[11px] font-semibold text-[#7C3AED] uppercase tracking-wide mb-3">Property Development &amp; Handover</p>
+            <ul className="text-xs text-[#6B7E72] leading-relaxed space-y-1.5 mb-6 flex-1">
+              <li className="flex gap-2"><span className="text-[#7C3AED] font-bold">✓</span> Digital handover and snagging list management per unit</li>
+              <li className="flex gap-2"><span className="text-[#7C3AED] font-bold">✓</span> Defect Liability Period (DLP) tracker per project</li>
+              <li className="flex gap-2"><span className="text-[#7C3AED] font-bold">✓</span> Assign contractor, track sign-off, generate handover certificates</li>
+              <li className="flex gap-2"><span className="text-[#7C3AED] font-bold">✓</span> Asset protection documentation from day one</li>
+            </ul>
+            <Link
+              href="/portal?mode=signup&role=developer"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-[#7C3AED] hover:underline group-hover:gap-3 transition-all"
+            >
+              Register as a Developer →
+            </Link>
+          </div>
+
+          {/* 5 — Diaspora Owners */}
+          <div className="bg-white rounded-3xl border border-[#D8E4DC] p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col group">
+            <div className="w-12 h-12 rounded-2xl bg-[#D6EDE1] text-[#0F3D26] flex items-center justify-center text-2xl mb-5">🌍</div>
+            <h3 className="text-lg font-serif font-bold text-[#111A14] mb-1">Diaspora Property Owners</h3>
+            <p className="text-[11px] font-semibold text-[#0F3D26] uppercase tracking-wide mb-3">Owners Based Abroad</p>
+            <ul className="text-xs text-[#6B7E72] leading-relaxed space-y-1.5 mb-6 flex-1">
+              <li className="flex gap-2"><span className="text-[#0F3D26] font-bold">✓</span> Trusted local agent assigned to act on your behalf in Ghana</li>
+              <li className="flex gap-2"><span className="text-[#0F3D26] font-bold">✓</span> Photo + condition reports from on-site inspections</li>
+              <li className="flex gap-2"><span className="text-[#0F3D26] font-bold">✓</span> Coordinated repairs without you needing to be there</li>
+              <li className="flex gap-2"><span className="text-[#0F3D26] font-bold">✓</span> Rental income and maintenance history in GHS, USD or GBP</li>
+            </ul>
+            <Link
+              href="/portal?mode=signup&role=investor"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-[#0F3D26] hover:underline group-hover:gap-3 transition-all"
+            >
+              Set Up Remote Oversight →
+            </Link>
+          </div>
+
+          {/* 6 — Tenants */}
+          <div className="bg-white rounded-3xl border border-[#D8E4DC] p-8 shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col group">
+            <div className="w-12 h-12 rounded-2xl bg-[#FEF6EF] text-[#E87722] flex items-center justify-center text-2xl mb-5">🔑</div>
+            <h3 className="text-lg font-serif font-bold text-[#111A14] mb-1">Tenants</h3>
+            <p className="text-[11px] font-semibold text-[#E87722] uppercase tracking-wide mb-3">Residential &amp; Commercial Renters</p>
+            <ul className="text-xs text-[#6B7E72] leading-relaxed space-y-1.5 mb-6 flex-1">
+              <li className="flex gap-2"><span className="text-[#E87722] font-bold">✓</span> See exactly what you owe and when — no disputes about the schedule</li>
+              <li className="flex gap-2"><span className="text-[#E87722] font-bold">✓</span> Pay by MTN MoMo, Telecel Cash or AT Money in a few taps</li>
+              <li className="flex gap-2"><span className="text-[#E87722] font-bold">✓</span> Log a maintenance issue and track its status until it&apos;s fixed</li>
+              <li className="flex gap-2"><span className="text-[#E87722] font-bold">✓</span> Legal protection — only ever billed the Rent Act 220 legal amount</li>
+            </ul>
+            <Link
+              href="/portal?mode=signup&role=tenant"
+              className="inline-flex items-center gap-2 text-xs font-semibold text-[#E87722] hover:underline group-hover:gap-3 transition-all"
+            >
+              Find Your Lease →
             </Link>
           </div>
         </div>
@@ -490,9 +563,13 @@ export default function Home() {
                     onChange={e => setFormData({ ...formData, service: e.target.value })}
                     className="w-full px-4 py-3 text-xs rounded-xl border border-[#D8E4DC] outline-none focus:border-[#1A5C3A] bg-white"
                   >
-                    <option>Estate & Property Management</option>
+                    <option>Residential Rent & Lease Management</option>
                     <option>Tenant Support</option>
-                    <option>Maintenance Partnership</option>
+                    <option>Commercial / SME Facilities</option>
+                    <option>Developer / Handover Services</option>
+                    <option>Diaspora / Remote Property Oversight</option>
+                    <option>Institution / Scheduled Maintenance</option>
+                    <option>Maintenance Partnership (Technician)</option>
                     <option>General Inquiry</option>
                   </select>
                 </div>

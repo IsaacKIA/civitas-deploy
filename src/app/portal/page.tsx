@@ -7,14 +7,17 @@ import { useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { ROLE_HOME_ROUTE } from '@/lib/section-roles';
 
-type Role = 'client' | 'tenant' | 'investor' | 'technician';
+type Role = 'client' | 'sme_owner' | 'developer' | 'institution_admin' | 'investor' | 'tenant' | 'technician';
 type AuthMode = 'signin' | 'signup' | 'verify';
 
 const ROLES: { id: Role; emoji: string; label: string; description: string }[] = [
-  { id: 'client',     emoji: '🏠', label: 'Property Owner', description: 'Manage estates, rentals & energy' },
-  { id: 'tenant',     emoji: '🔑', label: 'Tenant',         description: 'Pay rent, log issues & track status' },
-  { id: 'investor',   emoji: '💼', label: 'Investor',       description: 'For future investment features' },
-  { id: 'technician', emoji: '🔧', label: 'Technician',     description: 'Receive & complete dispatch orders' },
+  { id: 'client',            emoji: '🏠', label: 'Property Owner / Landlord', description: 'Manage residential estates, tenants & rentals' },
+  { id: 'sme_owner',         emoji: '🏢', label: 'Business / SME',            description: 'Manage commercial premises, cleaning & facilities' },
+  { id: 'developer',         emoji: '🏗️', label: 'Developer / Estate Agent',  description: 'Handover, defect tracking & asset protection' },
+  { id: 'institution_admin', emoji: '🏛️', label: 'Institution / Corporate',  description: 'Campuses, hospitals, schools & enterprise facility management' },
+  { id: 'investor',          emoji: '🌍', label: 'Diaspora Owner',             description: 'Remote oversight, local agent delegation & reports' },
+  { id: 'tenant',            emoji: '🔑', label: 'Tenant',                    description: 'Pay rent by Mobile Money, log issues & track status' },
+  { id: 'technician',        emoji: '🔧', label: 'Technician / Artisan',       description: 'Receive & complete maintenance dispatch orders' },
 ];
 
 function PasswordStrength({ password }: { password: string }) {

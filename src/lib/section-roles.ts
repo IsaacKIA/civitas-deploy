@@ -16,10 +16,13 @@ import type { AppRole } from '@/lib/supabase/server';
  * so the role check adds no extra query.
  */
 export const SECTION_ROLES: Record<string, AppRole[]> = {
-  owner: ['org_admin', 'super_admin', 'client'],
-  tenant: ['tenant', 'super_admin'],
-  investor: ['investor', 'super_admin'],
-  technician: ['technician', 'ops_manager', 'super_admin'],
+  owner:       ['org_admin', 'super_admin', 'client'],
+  sme:         ['sme_owner', 'org_admin', 'super_admin'],
+  developer:   ['developer', 'org_admin', 'super_admin'],
+  institution: ['institution_admin', 'org_admin', 'super_admin'],
+  tenant:      ['tenant', 'super_admin'],
+  investor:    ['investor', 'super_admin'],
+  technician:  ['technician', 'ops_manager', 'super_admin'],
 };
 
 /**
@@ -29,11 +32,14 @@ export const SECTION_ROLES: Record<string, AppRole[]> = {
  * dashboard yet.
  */
 export const ROLE_HOME_ROUTE: Record<AppRole, string> = {
-  client: '/dashboard/owner',
-  org_admin: '/dashboard/owner',
-  super_admin: '/dashboard/owner',
-  tenant: '/dashboard/tenant',
-  investor: '/dashboard/investor',
-  technician: '/dashboard/technician',
-  ops_manager: '/dashboard/technician',
+  client:            '/dashboard/owner',
+  org_admin:         '/dashboard/owner',
+  super_admin:       '/dashboard/owner',
+  sme_owner:         '/dashboard/sme',
+  developer:         '/dashboard/developer',
+  institution_admin: '/dashboard/institution',
+  tenant:            '/dashboard/tenant',
+  investor:          '/dashboard/investor',
+  technician:        '/dashboard/technician',
+  ops_manager:       '/dashboard/technician',
 };

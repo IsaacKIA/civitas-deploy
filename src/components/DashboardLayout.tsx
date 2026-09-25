@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import CurrencyToggle, { CurrencyProvider } from '@/components/CurrencyToggle';
 
 interface NavItem { label: string; href: string; icon: string; }
 interface DashboardLayoutProps {
   children: React.ReactNode;
-  role: 'owner' | 'tenant' | 'technician' | 'investor';
+  role: 'owner' | 'tenant' | 'technician' | 'investor' | 'sme' | 'developer' | 'institution';
   userName?: string;
 }
 
@@ -21,6 +22,7 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
     { label: 'Finances',      href: '/dashboard/owner/finances',     icon: '💰' },
     { label: 'Energy',        href: '/dashboard/owner/energy',       icon: '☀️' },
     { label: 'Documents',     href: '/dashboard/owner/documents',    icon: '📄' },
+    { label: 'Settings',      href: '/dashboard/owner/settings',     icon: '⚙️' },
   ],
   tenant: [
     { label: 'Overview',      href: '/dashboard/tenant',             icon: '📊' },
@@ -36,19 +38,52 @@ const NAV_ITEMS: Record<string, NavItem[]> = {
     { label: 'My Profile',    href: '/dashboard/technician/profile',    icon: '👤' },
   ],
   investor: [
-    { label: 'Portfolio',     href: '/dashboard/investor',              icon: '📈' },
-    { label: 'Marketplace',   href: '/dashboard/investor/marketplace',  icon: '🏗️' },
-    { label: 'Dividends',     href: '/dashboard/investor/dividends',    icon: '💸' },
-    { label: 'ESG Report',    href: '/dashboard/investor/esg',          icon: '🌿' },
-    { label: 'Documents',     href: '/dashboard/investor/documents',    icon: '📄' },
+    { label: 'Overview',         href: '/dashboard/investor',              icon: '🏗️' },
+    { label: 'My Properties',    href: '/dashboard/investor/properties',   icon: '🏠' },
+    { label: 'Local Agent',      href: '/dashboard/investor/agent',        icon: '🤝' },
+    { label: 'Inspections',      href: '/dashboard/investor/inspection',   icon: '📸' },
+    { label: 'Remittance',       href: '/dashboard/investor/remittance',   icon: '💱' },
+    { label: 'ESG Report',       href: '/dashboard/investor/esg',          icon: '🌿' },
+    { label: 'Documents',        href: '/dashboard/investor/documents',    icon: '📄' },
+    { label: 'Settings',         href: '/dashboard/owner/settings',        icon: '⚙️' },
+  ],
+  sme: [
+    { label: 'Overview',         href: '/dashboard/sme',              icon: '📊' },
+    { label: 'Premises',         href: '/dashboard/sme/premises',     icon: '🏢' },
+    { label: 'Maintenance',      href: '/dashboard/sme/maintenance',  icon: '🔧' },
+    { label: 'Service Schedule', href: '/dashboard/sme/schedule',     icon: '📅' },
+    { label: 'Facility Services',href: '/dashboard/sme/services',     icon: '⚡' },
+    { label: 'Documents',        href: '/dashboard/sme/documents',    icon: '📄' },
+    { label: 'Settings',         href: '/dashboard/owner/settings',   icon: '⚙️' },
+  ],
+  developer: [
+    { label: 'Overview',         href: '/dashboard/developer',           icon: '🏗️' },
+    { label: 'Projects & Sites', href: '/dashboard/developer/projects',  icon: '🏙️' },
+    { label: 'Units & Handover', href: '/dashboard/developer/handover',  icon: '📋' },
+    { label: 'Warranty & Snags', href: '/dashboard/developer/warranties',icon: '🛡️' },
+    { label: 'Documents',        href: '/dashboard/developer/documents', icon: '📄' },
+    { label: 'Settings',         href: '/dashboard/owner/settings',      icon: '⚙️' },
+  ],
+  institution: [
+    { label: 'Overview',           href: '/dashboard/institution',            icon: '🏛️' },
+    { label: 'Asset Register',     href: '/dashboard/institution/assets',     icon: '⚙️' },
+    { label: 'Preventive Schedule',href: '/dashboard/institution/schedule',   icon: '📅' },
+    { label: 'Work Orders',        href: '/dashboard/institution/maintenance',icon: '🔧' },
+    { label: 'SLA & Uptime',       href: '/dashboard/institution/sla',        icon: '📊' },
+    { label: 'Facilities Team',    href: '/dashboard/institution/team',       icon: '👥' },
+    { label: 'Compliance Vault',   href: '/dashboard/institution/documents',  icon: '📄' },
+    { label: 'Settings',           href: '/dashboard/owner/settings',         icon: '⚙️' },
   ],
 };
 
 const ROLE_META = {
-  owner:      { label: 'Property Owner',  color: '#1A5C3A', bg: '#EEF7F2', emoji: '🏠' },
-  tenant:     { label: 'Tenant',          color: '#2563EB', bg: '#EFF6FF', emoji: '🔑' },
-  technician: { label: 'Technician',      color: '#D97706', bg: '#FEF3C7', emoji: '🔧' },
-  investor:   { label: 'Investor',        color: '#7C3AED', bg: '#F5F3FF', emoji: '💼' },
+  owner:       { label: 'Property Owner',        color: '#1A5C3A', bg: '#EEF7F2', emoji: '🏠' },
+  tenant:      { label: 'Tenant',                color: '#2563EB', bg: '#EFF6FF', emoji: '🔑' },
+  technician:  { label: 'Technician',            color: '#D97706', bg: '#FEF3C7', emoji: '🔧' },
+  investor:    { label: 'Diaspora Owner',        color: '#0F3D26', bg: '#D6EDE1', emoji: '🌍' },
+  sme:         { label: 'Business / SME',        color: '#1E40AF', bg: '#EFF6FF', emoji: '🏢' },
+  developer:   { label: 'Developer',             color: '#7C3AED', bg: '#F5F3FF', emoji: '🏗️' },
+  institution: { label: 'Institution / Campus',  color: '#047857', bg: '#D1FAE5', emoji: '🏛️' },
 };
 
 function timeAgo(iso: string): string {
@@ -177,7 +212,8 @@ export default function DashboardLayout({ children, role, userName = 'User' }: D
   );
 
   return (
-    <div className="min-h-screen bg-[#F5F9F6] flex">
+    <CurrencyProvider>
+      <div className="min-h-screen bg-[#F5F9F6] flex">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-56 bg-white border-r border-[#D8E4DC] fixed top-0 left-0 h-screen z-30">
         {sidebarContent}
@@ -201,6 +237,9 @@ export default function DashboardLayout({ children, role, userName = 'User' }: D
             ☰
           </button>
           <div className="flex-1" />
+
+          {/* Currency Toggle */}
+          <CurrencyToggle />
 
           {/* Notifications Button & Dropdown */}
           <div className="relative">
@@ -281,5 +320,6 @@ export default function DashboardLayout({ children, role, userName = 'User' }: D
         <main className="flex-1 p-4 md:p-8">{children}</main>
       </div>
     </div>
+    </CurrencyProvider>
   );
 }

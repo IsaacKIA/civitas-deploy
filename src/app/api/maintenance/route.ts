@@ -8,6 +8,7 @@ import {
   type MaintenanceCategory,
   type MaintenancePriority,
 } from '@/lib/maintenance';
+import { dispatchNotification } from '@/lib/notification-dispatcher';
 
 interface CreateMaintenanceBody {
   propertyId: string;
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
 
   const { data: property, error: propertyError } = await supabase
     .from('properties')
-    .select('id, organization_id, owner_id')
+    .select('id, name, organization_id, owner_id')
     .eq('id', body.propertyId)
     .maybeSingle();
 
@@ -100,6 +101,21 @@ export async function POST(request: NextRequest) {
     console.error('[POST /api/maintenance] insert failed:', insertError?.message);
     return NextResponse.json({ error: 'Failed to submit request' }, { status: 500 });
   }
+
+  // Asynchronous multichannel dispatch
+  dispatchNotification({
+    event: 'maintenance_request_received',
+    recipientName: auth.profile.full_name || 'Resident',
+    recipientPhone: auth.profile.phone || undefined,
+    recipientEmail: auth.user.email || auth.profile.email,
+    userId: auth.user.id,
+    data: {
+      title: body.title.trim(),
+      property: property.name || 'Civitas Property',
+      ref: request_.reference_code,
+      priority: body.priority,
+    },
+  }).catch((err) => console.error('[POST /api/maintenance] notification failed:', err));
 
   return NextResponse.json({ requestId: request_.id, referenceCode: request_.reference_code }, { status: 201 });
 }

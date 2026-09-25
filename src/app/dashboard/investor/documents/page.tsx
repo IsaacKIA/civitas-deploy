@@ -1,16 +1,64 @@
 import DashboardLayout from '@/components/DashboardLayout';
+import { createSupabaseServerClient, getAuthedProfile } from '@/lib/supabase/server';
+import DocumentsClient from '@/app/dashboard/owner/documents/DocumentsClient';
 
-export default function InvestorDocumentsPage() {
+export default async function InvestorDocumentsPage() {
+  const auth = await getAuthedProfile();
+
+  if (!auth) {
+    return (
+      <DashboardLayout role="investor">
+        <div className="max-w-2xl mx-auto bg-white rounded-3xl p-8 border border-[#D8E4DC] shadow-sm text-center text-xs text-[#6B7E72]">
+          Your session has expired. Please sign in again.
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const supabase = await createSupabaseServerClient();
+
+  const [{ data: documents, error: docsError }, { data: leases, error: leasesError }, { data: properties }] = await Promise.all([
+    supabase
+      .from('property_documents')
+      .select('id, title, category, storage_path, file_size_bytes, mime_type, created_at, properties(name)')
+      .eq('owner_id', auth.user.id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('leases')
+      .select('id, status, created_at, properties(name), tenant:profiles!tenant_id(full_name)')
+      .eq('owner_id', auth.user.id)
+      .order('created_at', { ascending: false }),
+    supabase.from('properties').select('id, name').eq('owner_id', auth.user.id).order('created_at', { ascending: false }),
+  ]);
+
   return (
-    <DashboardLayout role="investor">
-      <div className="max-w-2xl mx-auto bg-white rounded-3xl border border-[#D8E4DC] shadow-sm p-12 text-center">
-        <div className="w-16 h-16 rounded-full bg-[#F5F3FF] text-[#7C3AED] text-3xl flex items-center justify-center mx-auto mb-5">📄</div>
-        <h1 className="text-xl font-serif font-bold text-[#0F3D26] mb-3">No investment documents yet</h1>
-        <p className="text-xs text-[#6B7E72] leading-relaxed max-w-md mx-auto">
-          Term sheets, capital account statements, and legal documents will appear here once Civitas has a real
-          investment product to generate them from.
-        </p>
-      </div>
+    <DashboardLayout role="investor" userName={auth.profile.full_name}>
+      <DocumentsClient
+        userId={auth.user.id}
+        organizationId={auth.profile.organization_id}
+        properties={(properties ?? []).map((p) => ({ id: p.id, name: p.name }))}
+        initialDocuments={(documents ?? []).map((d) => ({
+          id: d.id,
+          title: d.title,
+          category: d.category,
+          storagePath: d.storage_path,
+          fileSizeBytes: d.file_size_bytes,
+          mimeType: d.mime_type,
+          createdAt: d.created_at,
+          propertyName: (Array.isArray(d.properties) ? d.properties[0] : d.properties)?.name ?? null,
+        }))}
+        leases={(leases ?? []).map((l) => ({
+          id: l.id,
+          status: l.status,
+          createdAt: l.created_at,
+          propertyName: (Array.isArray(l.properties) ? l.properties[0] : l.properties)?.name ?? 'Property',
+          tenantName: (Array.isArray(l.tenant) ? l.tenant[0] : l.tenant)?.full_name ?? null,
+        }))}
+        hasError={!!docsError || !!leasesError}
+        titleText="Diaspora Document & Deed Vault"
+        subtitleText="Land title deeds, tenancy agreements, inspection reports, and remittance tax certificates"
+        accentColor="#0F3D26"
+      />
     </DashboardLayout>
   );
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServiceRoleClient, getAuthedProfile } from '@/lib/supabase/server';
+import { dispatchNotification } from '@/lib/notification-dispatcher';
 
 /**
  * SIMULATED confirmation step.
@@ -30,7 +31,7 @@ export async function POST(
 
   const { data: transaction, error: txError } = await db
     .from('momo_transactions')
-    .select('id, lease_id, installment_id, initiated_by, status, amount_ghs, leases!inner(tenant_id, owner_id, id, advance_months_requested, status)')
+    .select('id, lease_id, installment_id, initiated_by, status, amount_ghs, leases!inner(tenant_id, owner_id, id, advance_months_requested, status, properties(name), tenant:profiles!tenant_id(full_name, phone, email), owner:profiles!owner_id(full_name, phone, email))')
     .eq('id', transactionId)
     .single();
 
@@ -89,6 +90,54 @@ export async function POST(
   if (lease.status === 'pending_first_payment') {
     await db.from('leases').update({ status: 'active' }).eq('id', lease.id);
   }
+
+  // Fire-and-forget multichannel notification dispatches
+  (async () => {
+    try {
+      const propName = (Array.isArray(lease.properties) ? lease.properties[0] : lease.properties)?.name || 'Civitas Property';
+      const tenant = Array.isArray(lease.tenant) ? lease.tenant[0] : lease.tenant;
+      const owner = Array.isArray(lease.owner) ? lease.owner[0] : lease.owner;
+      const paymentDate = new Date().toLocaleDateString('en-GB');
+
+      // Dispatch to Tenant
+      if (tenant) {
+        dispatchNotification({
+          event: 'rent_payment_confirmed',
+          recipientName: tenant.full_name || 'Tenant',
+          recipientPhone: tenant.phone || undefined,
+          recipientEmail: tenant.email,
+          userId: lease.tenant_id,
+          data: {
+            property: propName,
+            amount: Number(transaction.amount_ghs).toLocaleString(),
+            ref: providerReference,
+            payment_date: paymentDate,
+            portal_url: 'https://www.civitasestate.com/dashboard/tenant/rent',
+          },
+        }).catch(() => {});
+      }
+
+      // Dispatch to Owner
+      if (owner) {
+        dispatchNotification({
+          event: 'rent_payment_confirmed',
+          recipientName: owner.full_name || 'Property Owner',
+          recipientPhone: owner.phone || undefined,
+          recipientEmail: owner.email,
+          userId: lease.owner_id,
+          data: {
+            property: propName,
+            amount: Number(transaction.amount_ghs).toLocaleString(),
+            ref: providerReference,
+            payment_date: paymentDate,
+            portal_url: 'https://www.civitasestate.com/dashboard/owner/finances',
+          },
+        }).catch(() => {});
+      }
+    } catch (err) {
+      console.error('[payment notification error]', err);
+    }
+  })();
 
   return NextResponse.json({ status: 'success', providerReference });
 }

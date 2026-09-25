@@ -74,9 +74,12 @@ export type AppRole =
   | 'org_admin'
   | 'ops_manager'
   | 'technician'
-  | 'client'
+  | 'client'      // homeowner / landlord
+  | 'sme_owner'   // SME / commercial premises manager
+  | 'developer'   // property developer / estate agent
+  | 'institution_admin' // corporate / school / clinic / church facility manager
   | 'tenant'
-  | 'investor';
+  | 'investor';   // diaspora owner
 
 /**
  * Fetches the authenticated user AND their profile role in one place.
@@ -101,7 +104,7 @@ export async function getAuthedProfile() {
 
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
-    .select('id, organization_id, role, full_name, email')
+    .select('id, organization_id, role, full_name, email, phone')
     .eq('id', user.id)
     .single();
 
@@ -114,6 +117,7 @@ export async function getAuthedProfile() {
         role: AppRole;
         full_name: string;
         email: string;
+        phone?: string | null;
       },
     };
   }
@@ -126,6 +130,7 @@ export async function getAuthedProfile() {
     user.email?.split('@')[0] ||
     'User';
   const email = user.email || '';
+  const phone = (user.user_metadata?.phone as string) || null;
 
   // Attempt to write the missing profile into public.profiles using service role client
   try {
@@ -138,11 +143,12 @@ export async function getAuthedProfile() {
           role,
           full_name: fullName,
           email,
+          phone,
           organization_id: crypto.randomUUID(),
         },
         { onConflict: 'id' }
       )
-      .select('id, organization_id, role, full_name, email')
+      .select('id, organization_id, role, full_name, email, phone')
       .single();
 
     if (newProfile) {
@@ -154,6 +160,7 @@ export async function getAuthedProfile() {
           role: AppRole;
           full_name: string;
           email: string;
+          phone?: string | null;
         },
       };
     }
@@ -170,6 +177,7 @@ export async function getAuthedProfile() {
       role,
       full_name: fullName,
       email,
+      phone,
     },
   };
 }

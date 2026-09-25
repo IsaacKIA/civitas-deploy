@@ -32,12 +32,20 @@ export default async function OwnerMaintenancePage() {
           <h1 className="text-2xl font-serif font-bold text-[#0F3D26]">Maintenance Requests</h1>
           <p className="text-xs text-[#6B7E72] mt-1">Every issue reported across your portfolio, by you or your tenants</p>
         </div>
-        <Link
-          href="/dashboard/owner/maintenance/new"
-          className="px-5 py-2.5 rounded-full bg-[#E87722] hover:bg-[#B85A10] text-white text-xs font-semibold transition-all shadow-sm flex items-center gap-2"
-        >
-          + Log New Issue
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/dashboard/owner/maintenance/schedule"
+            className="px-5 py-2.5 rounded-full border border-[#D8E4DC] hover:bg-[#F5F9F6] text-[#0F3D26] text-xs font-semibold transition-all shadow-xs flex items-center gap-1.5"
+          >
+            📅 Preventive Schedule
+          </Link>
+          <Link
+            href="/dashboard/owner/maintenance/new"
+            className="px-5 py-2.5 rounded-full bg-[#E87722] hover:bg-[#B85A10] text-white text-xs font-semibold transition-all shadow-sm flex items-center gap-2"
+          >
+            + Log New Issue
+          </Link>
+        </div>
       </div>
 
       {error && (

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient, createSupabaseServiceRoleClient, getAuthedProfile } from '@/lib/supabase/server';
+import { dispatchNotification } from '@/lib/notification-dispatcher';
 
 interface AssignBody {
   action: 'assign';
@@ -63,6 +64,57 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (error || !updated || updated.length === 0) {
       return NextResponse.json({ error: 'Could not assign technician — you may not own this request' }, { status: 403 });
     }
+
+    // Dispatch assignment notifications asynchronously
+    (async () => {
+      try {
+        const { data: reqData } = await serviceDb
+          .from('maintenance_requests')
+          .select('reference_code, title, category, priority, property:properties(name), reporter:profiles!reported_by(full_name, phone, email), tech:profiles!technician_id(full_name, phone)')
+          .eq('id', requestId)
+          .single();
+
+        if (reqData) {
+          const propName = (Array.isArray(reqData.property) ? reqData.property[0] : reqData.property)?.name || 'Property';
+          const reporter = Array.isArray(reqData.reporter) ? reqData.reporter[0] : reqData.reporter;
+          const tech = Array.isArray(reqData.tech) ? reqData.tech[0] : reqData.tech;
+
+          if (reporter) {
+            dispatchNotification({
+              event: 'maintenance_request_assigned',
+              recipientName: reporter.full_name || 'Resident',
+              recipientPhone: reporter.phone || undefined,
+              recipientEmail: reporter.email,
+              data: {
+                title: reqData.title,
+                property: propName,
+                technician: tech?.full_name || 'Civitas Technician',
+                eta: 'Within 2 hours',
+                technician_phone: tech?.phone || '+233 55 506 2589',
+              },
+            }).catch(() => {});
+          }
+
+          if (tech?.phone) {
+            dispatchNotification({
+              event: 'work_order_dispatched',
+              recipientName: tech.full_name,
+              recipientPhone: tech.phone,
+              data: {
+                ref: reqData.reference_code,
+                property: propName,
+                category: reqData.category,
+                priority: reqData.priority,
+                respond_by: '30 mins',
+              },
+            }).catch(() => {});
+          }
+        }
+      } catch (err) {
+        console.error('[assign notification error]', err);
+      }
+    })();
+
     return NextResponse.json({ ok: true });
   }
 
@@ -83,6 +135,45 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     if (error || !updated || updated.length === 0) {
       return NextResponse.json({ error: 'Could not update status — this request may not be assigned to you' }, { status: 403 });
     }
+
+    if (body.status === 'completed') {
+      (async () => {
+        try {
+          const serviceDb = createSupabaseServiceRoleClient();
+          const { data: reqData } = await serviceDb
+            .from('maintenance_requests')
+            .select('reference_code, title, property:properties(name), reporter:profiles!reported_by(full_name, phone, email), tech:profiles!technician_id(full_name)')
+            .eq('id', requestId)
+            .single();
+
+          if (reqData) {
+            const propName = (Array.isArray(reqData.property) ? reqData.property[0] : reqData.property)?.name || 'Property';
+            const reporter = Array.isArray(reqData.reporter) ? reqData.reporter[0] : reqData.reporter;
+            const tech = Array.isArray(reqData.tech) ? reqData.tech[0] : reqData.tech;
+
+            if (reporter) {
+              dispatchNotification({
+                event: 'maintenance_request_completed',
+                recipientName: reporter.full_name || 'Resident',
+                recipientPhone: reporter.phone || undefined,
+                recipientEmail: reporter.email,
+                data: {
+                  ref: reqData.reference_code,
+                  property: propName,
+                  summary: reqData.title,
+                  duration: 'Same day',
+                  technician: tech?.full_name || 'Civitas Technician',
+                  rating_url: 'https://www.civitasestate.com/dashboard/tenant/maintenance',
+                },
+              }).catch(() => {});
+            }
+          }
+        } catch (err) {
+          console.error('[completed notification error]', err);
+        }
+      })();
+    }
+
     return NextResponse.json({ ok: true });
   }
 

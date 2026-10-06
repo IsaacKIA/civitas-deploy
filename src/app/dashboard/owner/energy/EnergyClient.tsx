@@ -42,7 +42,6 @@ export default function EnergyClient({ properties }: EnergyClientProps) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-telemetry-key': 'civitas-telemetry-dev',
         },
         body: JSON.stringify({
           propertyId: selectedProperty.id,

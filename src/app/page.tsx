@@ -1,14 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import EcoCalculator from '@/components/EcoCalculator';
-import AIChatWidget from '@/components/AIChatWidget';
 import TrustBadges from '@/components/TrustBadges';
 import LocationsGrid from '@/components/LocationsGrid';
 import FAQSection from '@/components/FAQSection';
 import Link from 'next/link';
 import Image from 'next/image';
+
+const AIChatWidget = dynamic(() => import('@/components/AIChatWidget'), { ssr: false });
 
 export default function Home() {
   const [formSubmitted, setFormSubmitted] = useState(false);
@@ -615,9 +617,11 @@ export default function Home() {
               <div className="bg-white p-2.5 rounded-2xl inline-block shadow-md transition-transform group-hover:scale-105">
                 <Image
                   src="/brand/civitas-logo-tight.png"
-                  alt="Civitas Estate and Maintenance"
+                  alt="Civitas Estate and Maintenance Ghana"
                   width={150}
                   height={130}
+                  loading="lazy"
+                  sizes="150px"
                   className="h-20 w-auto object-contain"
                 />
               </div>

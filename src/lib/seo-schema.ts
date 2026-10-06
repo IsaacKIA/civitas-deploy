@@ -3,18 +3,18 @@ export const LOCAL_BUSINESS_JSONLD = {
   "@graph": [
     {
       "@type": ["RealEstateAgent", "LocalBusiness", "ProfessionalService"],
-      "@id": "https://civitasestate.com/#organization",
+      "@id": "https://www.civitasestate.com/#organization",
       "name": "Civitas Estate & Maintenance Ltd",
-      "alternateName": ["Civitas PropTech", "Civitas Ghana", "Civitas Property Management"],
-      "url": "https://civitasestate.com",
+      "alternateName": ["Civitas PropTech", "Civitas Ghana", "Civitas Property Management", "Civitas Estate"],
+      "url": "https://www.civitasestate.com",
       "logo": {
         "@type": "ImageObject",
-        "@id": "https://civitasestate.com/#logo",
-        "url": "https://civitasestate.com/brand/civitas-logo.png",
+        "@id": "https://www.civitasestate.com/#logo",
+        "url": "https://www.civitasestate.com/brand/civitas-logo.png",
         "caption": "Civitas PropTech Ghana"
       },
-      "image": "https://civitasestate.com/og-image.png",
-      "description": "Ghana's premier PropTech and facility management platform providing Rent Act 220 compliant Mobile Money rent collections, diaspora property management, solar telemetry, and verified artisan dispatch across Greater Accra, Ashanti, and Central regions.",
+      "image": "https://www.civitasestate.com/og-image.png",
+      "description": "Ghana's premier PropTech and facility management platform providing Rent Act 220 compliant Mobile Money rent collections, diaspora property management, solar telemetry, and verified artisan dispatch across Greater Accra, Ashanti, Western, and Central regions.",
       "telephone": "+233-55-506-2589",
       "email": "admin@civitasestate.com",
       "priceRange": "$$",
@@ -51,13 +51,20 @@ export const LOCAL_BUSINESS_JSONLD = {
         { "@type": "Place", "name": "East Legon" },
         { "@type": "Place", "name": "Airport Residential Area" },
         { "@type": "Place", "name": "Cantonments" },
+        { "@type": "Place", "name": "Osu" },
+        { "@type": "Place", "name": "Labone" },
+        { "@type": "Place", "name": "Dzorwulu" },
+        { "@type": "Place", "name": "Spintex Road" },
         { "@type": "Place", "name": "Tema" },
         { "@type": "AdministrativeArea", "name": "Ashanti Region" },
         { "@type": "City", "name": "Kumasi" },
         { "@type": "Place", "name": "Ahodwo" },
+        { "@type": "Place", "name": "Danyame" },
+        { "@type": "AdministrativeArea", "name": "Western Region" },
+        { "@type": "City", "name": "Takoradi" },
         { "@type": "AdministrativeArea", "name": "Central Region" },
         { "@type": "City", "name": "Cape Coast" },
-        { "@type": "Place", "name": "Elmina" },
+        { "@type": "Place", "name": "Mankessim" },
         { "@type": "AdministrativeArea", "name": "Northern Region" },
         { "@type": "City", "name": "Tamale" }
       ],
@@ -127,20 +134,20 @@ export const LOCAL_BUSINESS_JSONLD = {
     },
     {
       "@type": "WebSite",
-      "@id": "https://civitasestate.com/#website",
-      "url": "https://civitasestate.com",
+      "@id": "https://www.civitasestate.com/#website",
+      "url": "https://www.civitasestate.com",
       "name": "Civitas PropTech",
-      "publisher": { "@id": "https://civitasestate.com/#organization" },
+      "publisher": { "@id": "https://www.civitasestate.com/#organization" },
       "inLanguage": "en-GH",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://civitasestate.com/?q={search_term_string}",
+        "target": "https://www.civitasestate.com/?q={search_term_string}",
         "query-input": "required name=search_term_string"
       }
     },
     {
       "@type": "SoftwareApplication",
-      "@id": "https://civitasestate.com/#software",
+      "@id": "https://www.civitasestate.com/#software",
       "name": "Civitas PropTech Operating System",
       "operatingSystem": "Web, iOS, Android (PWA)",
       "applicationCategory": "BusinessApplication",
@@ -159,7 +166,7 @@ export const LOCAL_BUSINESS_JSONLD = {
     },
     {
       "@type": "FAQPage",
-      "@id": "https://civitasestate.com/#faq",
+      "@id": "https://www.civitasestate.com/#faq",
       "mainEntity": [
         {
           "@type": "Question",

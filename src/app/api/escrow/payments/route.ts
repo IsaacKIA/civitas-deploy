@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient, getAuthedProfile } from '@/lib/supabase/server';
 import { isValidGhanaMobileNumber, type MomoRail } from '@/lib/escrow';
+import { initializePaystackTransaction } from '@/lib/paystack';
 
 interface InitiatePaymentBody {
   installmentId: string;
@@ -51,6 +52,32 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Generate distinct Paystack reference
+  const paystackRef = `CIV-${installment.id.slice(0, 8)}-${Date.now()}`;
+  let authorizationUrl: string | undefined;
+
+  // Initialize with Paystack if secret key is configured
+  if (process.env.PAYSTACK_SECRET_KEY) {
+    try {
+      const paystackRes = await initializePaystackTransaction({
+        email: auth.profile.email || auth.user.email || 'billing@civitasestate.com',
+        amountGhs: Number(installment.amount_ghs),
+        reference: paystackRef,
+        callbackUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/dashboard/tenant/rent?paid=${installment.id}`,
+        metadata: {
+          lease_id: installment.lease_id,
+          installment_id: installment.id,
+          initiated_by: auth.user.id,
+          rail,
+          phone_number: phoneNumber,
+        },
+      });
+      authorizationUrl = paystackRes.data.authorization_url;
+    } catch (paystackErr) {
+      console.warn('[POST /api/escrow/payments] Paystack init note:', paystackErr instanceof Error ? paystackErr.message : paystackErr);
+    }
+  }
+
   const { data: transaction, error: insertError } = await supabase
     .from('momo_transactions')
     .insert({
@@ -60,9 +87,10 @@ export async function POST(request: NextRequest) {
       rail,
       phone_number: phoneNumber,
       amount_ghs: installment.amount_ghs,
+      provider_reference: paystackRef,
       status: 'initiated',
     })
-    .select('id, amount_ghs, rail, phone_number')
+    .select('id, amount_ghs, rail, phone_number, provider_reference')
     .single();
 
   if (insertError || !transaction) {
@@ -70,15 +98,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Failed to initiate payment' }, { status: 500 });
   }
 
-  // Mark the installment as awaiting confirmation so it can't be paid twice
-  // concurrently. Service-role isn't needed for this narrow transition —
-  // still done via a dedicated update, restricted to rows this tenant
-  // legitimately just created a transaction against.
+  // Mark the installment as awaiting confirmation so it can't be paid twice concurrently
   await supabase
     .from('lease_installments')
     .update({ status: 'pending_confirmation' })
     .eq('id', installment.id)
     .eq('status', 'due');
 
-  return NextResponse.json({ transactionId: transaction.id }, { status: 201 });
+  return NextResponse.json({
+    transactionId: transaction.id,
+    reference: paystackRef,
+    authorizationUrl,
+  }, { status: 201 });
 }
+

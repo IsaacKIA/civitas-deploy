@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 
 export type Currency = 'GHS' | 'USD' | 'GBP' | 'EUR';
 
@@ -35,24 +35,37 @@ const CurrencyContext = createContext<CurrencyContextType>({
   symbol: 'GH₵',
 });
 
-export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrencyState] = useState<Currency>('GHS');
+function subscribe(callback: () => void) {
+  window.addEventListener('storage', callback);
+  return () => window.removeEventListener('storage', callback);
+}
 
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('civitas_currency') as Currency;
-      if (saved && (saved === 'GHS' || saved === 'USD' || saved === 'GBP' || saved === 'EUR')) {
-        setCurrencyState(saved);
-      }
-    } catch {
-      // LocalStorage unavailable
+function getSnapshot(): Currency {
+  try {
+    const saved = localStorage.getItem('civitas_currency') as Currency;
+    if (saved && (saved === 'GHS' || saved === 'USD' || saved === 'GBP' || saved === 'EUR')) {
+      return saved;
     }
-  }, []);
+  } catch {
+    // LocalStorage unavailable
+  }
+  return 'GHS';
+}
+
+function getServerSnapshot(): Currency {
+  return 'GHS';
+}
+
+export function CurrencyProvider({ children }: { children: React.ReactNode }) {
+  const [internalCurrency, setInternalCurrency] = useState<Currency>('GHS');
+  const storeCurrency = React.useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const currency = internalCurrency !== 'GHS' ? internalCurrency : storeCurrency;
 
   const setCurrency = (c: Currency) => {
-    setCurrencyState(c);
+    setInternalCurrency(c);
     try {
       localStorage.setItem('civitas_currency', c);
+      window.dispatchEvent(new Event('storage'));
     } catch {
       // LocalStorage unavailable
     }

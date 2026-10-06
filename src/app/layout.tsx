@@ -7,39 +7,36 @@ import { LOCAL_BUSINESS_JSONLD } from "@/lib/seo-schema";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
-// Every headline on the site uses font-serif, but no serif face was ever
-// actually loaded — it was silently falling back to the browser's generic
-// default serif (Georgia/Times). Fraunces is a warm, characterful display
-// serif with real personality at large sizes (its "soft" optical variant
-// suits "Sustainable Legacy" better than the ubiquitous Playfair Display),
-// used deliberately only for headlines, not body copy.
 const fraunces = Fraunces({
   variable: "--font-fraunces",
   subsets: ["latin"],
   style: ["normal", "italic"],
   axes: ["opsz", "SOFT"],
+  display: "swap",
 });
 
 export const viewport: Viewport = {
   themeColor: "#0F3D26",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  maximumScale: 5,
 };
 
 export const metadata: Metadata = {
   title: {
-    default: "Civitas PropTech — Property & Estate Management Platform in Ghana",
+    default: "Civitas PropTech — #1 Property & Estate Management Platform in Ghana",
     template: "%s | Civitas PropTech Ghana",
   },
-  description: "Ghana's #1 integrated PropTech platform: Rent Act 220 compliant Mobile Money rent collections, diaspora property management, solar telemetry, and verified artisan dispatch across Accra, Kumasi & Takoradi.",
+  description: "Ghana's #1 integrated PropTech platform: Rent Act 220 compliant Mobile Money rent collections (MTN MoMo, Telecel Cash), diaspora remote property management, solar telemetry, and verified artisan dispatch across Accra, Kumasi & Takoradi.",
   keywords: [
     "PropTech Ghana",
     "property management Ghana",
@@ -48,6 +45,7 @@ export const metadata: Metadata = {
     "property management Cantonments",
     "property management Airport Residential",
     "property management Kumasi",
+    "property management Takoradi",
     "diaspora property management Ghana",
     "Ghana Rent Act 220 compliance",
     "pay rent with MTN Mobile Money",
@@ -55,14 +53,22 @@ export const metadata: Metadata = {
     "solar energy property management Ghana",
     "facility management Ghana",
     "developer handover certificate Ghana",
-    "artisan maintenance Accra"
+    "artisan maintenance Accra",
+    "real estate software Ghana"
   ],
-  authors: [{ name: "Civitas Estate & Maintenance Ltd", url: "https://civitasestate.com" }],
+  authors: [{ name: "Civitas Estate & Maintenance Ltd", url: "https://www.civitasestate.com" }],
   creator: "Civitas Estate & Maintenance Ltd",
   publisher: "Civitas Estate & Maintenance Ltd",
-  metadataBase: new URL("https://civitasestate.com"),
+  metadataBase: new URL("https://www.civitasestate.com"),
   alternates: {
-    canonical: "https://civitasestate.com",
+    canonical: "https://www.civitasestate.com",
+    languages: {
+      "en-GH": "https://www.civitasestate.com",
+      "en": "https://www.civitasestate.com",
+    },
+  },
+  verification: {
+    google: "google59e336434f702a44",
   },
   appleWebApp: {
     capable: true,
@@ -72,13 +78,13 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_GH",
-    url: "https://civitasestate.com",
+    url: "https://www.civitasestate.com",
     siteName: "Civitas PropTech",
-    title: "Civitas PropTech — Smart Living & Estate Management in Ghana",
+    title: "Civitas PropTech — #1 Property & Estate Management Platform in Ghana",
     description: "Ghana's leading PropTech platform. Rent Act 220 compliant rent payments via Mobile Money, diaspora remote property management, solar telemetry, and verified artisan dispatch.",
     images: [
       {
-        url: "/og-image.png",
+        url: "https://www.civitasestate.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "Civitas PropTech — Smart Living. Sustainable Legacy.",
@@ -87,9 +93,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Civitas PropTech — Smart Living & Estate Management in Ghana",
+    title: "Civitas PropTech — #1 Property & Estate Management Platform in Ghana",
     description: "Ghana's leading PropTech platform. Rent Act 220 compliant Mobile Money payments, diaspora remote management, solar telemetry & 24/7 maintenance dispatch.",
-    images: ["/og-image.png"],
+    images: ["https://www.civitasestate.com/og-image.png"],
     creator: "@civitasestate",
   },
   robots: {
@@ -112,9 +118,10 @@ export const metadata: Metadata = {
   },
   other: {
     "geo.region": "GH-AA",
-    "geo.placename": "Accra",
+    "geo.placename": "Accra, Ghana",
     "geo.position": "5.6358;-0.1601",
     "ICBM": "5.6358, -0.1601",
+    "google-site-verification": "google59e336434f702a44",
   },
 };
 
@@ -130,6 +137,9 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{

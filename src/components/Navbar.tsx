@@ -47,6 +47,7 @@ export default function Navbar() {
               alt="Civitas Estate and Maintenance Logo"
               width={36}
               height={36}
+              sizes="36px"
               className="w-full h-full object-contain"
               priority
             />

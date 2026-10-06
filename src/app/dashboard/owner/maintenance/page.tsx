@@ -4,6 +4,19 @@ import { createSupabaseServerClient, getAuthedProfile } from '@/lib/supabase/ser
 import { MAINTENANCE_CATEGORIES, MAINTENANCE_PRIORITIES, MAINTENANCE_STATUS_STYLE } from '@/lib/maintenance';
 import AssignTechnicianControl from './AssignTechnicianControl';
 
+interface MaintenanceRequestRow {
+  id: string;
+  category: string;
+  priority: string;
+  title: string;
+  status: string;
+  created_at: string;
+  reference_code: string;
+  properties: { name: string } | { name: string }[] | null;
+  tenant: { full_name: string } | { full_name: string }[] | null;
+  technician?: { full_name: string } | { full_name: string }[] | null;
+}
+
 export default async function OwnerMaintenancePage() {
   const auth = await getAuthedProfile();
 
@@ -65,10 +78,10 @@ export default async function OwnerMaintenancePage() {
       {!error && requests && requests.length > 0 && (
         <div className="bg-white rounded-3xl border border-[#D8E4DC] shadow-sm overflow-hidden">
           <div className="divide-y divide-[#D8E4DC]">
-            {requests.map((r) => {
+            {(requests as unknown as MaintenanceRequestRow[]).map((r) => {
               const property = Array.isArray(r.properties) ? r.properties[0] : r.properties;
               const tenant = Array.isArray(r.tenant) ? r.tenant[0] : r.tenant;
-              const technician = (r as any).technician ? (Array.isArray((r as any).technician) ? (r as any).technician[0] : (r as any).technician) : null;
+              const technician = r.technician ? (Array.isArray(r.technician) ? r.technician[0] : r.technician) : null;
               const category = MAINTENANCE_CATEGORIES.find((c) => c.id === r.category);
               const priority = MAINTENANCE_PRIORITIES.find((p) => p.id === r.priority);
               return (

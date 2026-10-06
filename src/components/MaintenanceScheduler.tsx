@@ -213,7 +213,7 @@ export default function MaintenanceScheduler({
                   <label className="block text-xs font-semibold text-[#111A14] mb-1">Servicing Frequency</label>
                   <select
                     value={frequency}
-                    onChange={(e) => setFrequency(e.target.value as any)}
+                    onChange={(e) => setFrequency(e.target.value as ScheduledService['frequency'])}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-[#D8E4DC] text-xs outline-none focus:border-[#1A5C3A] bg-white"
                   >
                     {FREQUENCIES.map((f) => (

@@ -247,7 +247,7 @@ function PortalPageInner() {
               <ul className="list-disc pl-4 space-y-0.5 text-[#6B7E72]">
                 <li>Check your <strong>Spam / Junk</strong> folder (especially for Yahoo & Gmail).</li>
                 <li>Ensure <code>{suEmail || 'your email'}</code> was entered correctly.</li>
-                <li>Verify your domain's SMTP settings if using a custom mail server.</li>
+                <li>Verify your domain&apos;s SMTP settings if using a custom mail server.</li>
               </ul>
             </div>
 

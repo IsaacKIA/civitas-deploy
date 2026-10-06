@@ -13,7 +13,7 @@ type Platform = 'ios' | 'android' | 'desktop';
 function detectPlatform(): Platform {
   if (typeof navigator === 'undefined') return 'desktop';
   const ua = navigator.userAgent;
-  if (/iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream) return 'ios';
+  if (/iPad|iPhone|iPod/.test(ua) && !('MSStream' in window)) return 'ios';
   if (/Android/.test(ua)) return 'android';
   return 'desktop';
 }
@@ -73,7 +73,6 @@ export default function PWAInstallPrompt() {
 
     // Only show on mobile devices
     const p = detectPlatform();
-    setPlatform(p);
 
     // Don't show on desktop or if user already dismissed this session
     if (p === 'desktop') return;
@@ -86,7 +85,10 @@ export default function PWAInstallPrompt() {
     }
 
     // Delay banner appearance slightly for a polished feel
-    const timer = setTimeout(() => setVisible(true), 2500);
+    const timer = setTimeout(() => {
+      setPlatform(p);
+      setVisible(true);
+    }, 2500);
     return () => clearTimeout(timer);
   }, []);
 

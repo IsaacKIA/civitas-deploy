@@ -18,7 +18,7 @@ interface Development {
 }
 
 export default function ProjectsClient({ initialDevelopments }: { initialDevelopments: Development[] }) {
-  const [developments, setDevelopments] = useState(initialDevelopments);
+  const [developments] = useState(initialDevelopments);
   const [isBulkOpen, setIsBulkOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 

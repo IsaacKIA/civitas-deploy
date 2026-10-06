@@ -14,12 +14,12 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
       {
-        userAgent: 'Googlebot',
+        userAgent: ['Googlebot', 'Bingbot', 'Applebot', 'DuckDuckBot'],
         allow: ['/', '/portal'],
         disallow: ['/dashboard/', '/api/'],
       },
     ],
-    sitemap: 'https://civitasestate.com/sitemap.xml',
-    host: 'https://civitasestate.com',
+    sitemap: 'https://www.civitasestate.com/sitemap.xml',
+    host: 'https://www.civitasestate.com',
   };
 }

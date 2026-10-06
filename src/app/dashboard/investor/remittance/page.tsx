@@ -1,5 +1,4 @@
 import DashboardLayout from '@/components/DashboardLayout';
-import Link from 'next/link';
 import { getAuthedProfile } from '@/lib/supabase/server';
 import { CurrencyAmount } from '@/components/CurrencyToggle';
 

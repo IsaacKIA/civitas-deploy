@@ -21,13 +21,12 @@ interface InverterPayload {
 }
 
 export async function POST(request: NextRequest) {
-  // Verify API Key
+  // Verify API Key or Authenticated Owner Session
   const authHeader = request.headers.get('x-telemetry-key');
   const validKey =
     authHeader &&
-    (authHeader === process.env.TELEMETRY_API_KEY ||
-      authHeader === process.env.INTERNAL_API_SECRET ||
-      authHeader === 'civitas-telemetry-dev');
+    ((process.env.TELEMETRY_API_KEY && authHeader === process.env.TELEMETRY_API_KEY) ||
+      (process.env.INTERNAL_API_SECRET && authHeader === process.env.INTERNAL_API_SECRET));
 
   if (!validKey) {
     const auth = await getAuthedProfile();

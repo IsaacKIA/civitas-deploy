@@ -28,7 +28,8 @@ export type NotificationEvent =
   | 'technician_en_route'
   | 'handover_certificate_ready'
   | 'agent_delegation_accepted'
-  | 'remittance_received';
+  | 'remittance_received'
+  | 'rent_escrow_deposit_received';
 
 export interface NotificationPayload {
   event: NotificationEvent;
@@ -103,6 +104,9 @@ const SMS: Record<NotificationEvent, (data: Record<string, string | number>) => 
 
   remittance_received: (d) =>
     `[${BRAND}] Remittance received: ${d.currency} ${d.amount} (GHS ${d.ghs_amount}) for ${d.property}. Ref: ${d.ref}. Reply STOP to opt out.`,
+
+  rent_escrow_deposit_received: (d) =>
+    `[${BRAND}] Escrow deposit: GHS ${d.amount} received from ${d.tenant_name} for ${d.property}. Ref: ${d.ref || d.reference}. Release window: ${d.escrow_release_window || '24 Hours'}. Reply STOP to opt out.`,
 };
 
 // ---------------------------------------------------------------------------
@@ -369,6 +373,24 @@ An overseas payment for your property has been received.
 📅 *Date:* ${d.payment_date}
 
 Your payment history is available in your Diaspora Owner dashboard.
+
+_Civitas FM · Reply STOP to opt out._
+`.trim(),
+
+  rent_escrow_deposit_received: (name, d) => `
+🛡️ *Escrow Rent Deposit Received*
+
+Hi ${name},
+
+A rent payment has been received and held in secure escrow.
+
+👤 *Tenant:* ${d.tenant_name}
+🏠 *Property:* ${d.property}
+💰 *Amount:* GHS ${d.amount}
+🔖 *Reference:* ${d.reference || d.ref}
+⏱️ *Escrow Release Window:* ${d.escrow_release_window || '24 Hours'}
+
+Funds will be released into your designated account following standard audit clearing.
 
 _Civitas FM · Reply STOP to opt out._
 `.trim(),

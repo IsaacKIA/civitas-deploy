@@ -1,5 +1,4 @@
 import DashboardLayout from '@/components/DashboardLayout';
-import Link from 'next/link';
 import { getAuthedProfile } from '@/lib/supabase/server';
 
 export default async function DiasporaInspectionPage() {

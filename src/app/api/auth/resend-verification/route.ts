@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
     }
 
     const verificationLink = linkData.properties.action_link;
-    const year = new Date().getFullYear();
 
     // Dispatch via Resend HTTP API
     const resendRes = await fetch('https://api.resend.com/emails', {

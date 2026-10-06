@@ -120,6 +120,8 @@ function getEventEmailSubject(event: NotificationEvent, data: Record<string, str
       return `Agent Delegation Confirmed for ${data.property ?? ''}`;
     case 'remittance_received':
       return `Remittance Received: ${data.currency ?? 'USD'} ${data.amount ?? ''}`;
+    case 'rent_escrow_deposit_received':
+      return `Escrow Deposit Received: GHS ${data.amount ?? ''} for ${data.property ?? 'your property'}`;
     default:
       return `Civitas Notification: ${String(event).replace(/_/g, ' ')}`;
   }

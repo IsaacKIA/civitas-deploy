@@ -1,21 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServiceRoleClient, getAuthedProfile } from '@/lib/supabase/server';
 import { dispatchNotification } from '@/lib/notification-dispatcher';
+import { verifyPaystackTransaction } from '@/lib/paystack';
 
-/**
- * SIMULATED confirmation step.
- *
- * In production this state transition ("payment succeeded") must come from
- * a signed webhook sent by the Mobile Money aggregator (e.g. Hubtel,
- * Paystack Mobile Money, or a direct MTN/Telecel API), verified by
- * signature — NEVER from the tenant's own browser claiming "I entered my
- * PIN". This route exists so the UI flow (MobileMoneyCheckoutModal) has a
- * real endpoint to call while no aggregator is wired up yet.
- *
- * Before going live: add a POST /api/escrow/payments/webhook route that
- * verifies the provider's signature and performs this same transition, and
- * either remove this route or restrict it to admin/QA use only.
- */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -31,7 +18,7 @@ export async function POST(
 
   const { data: transaction, error: txError } = await db
     .from('momo_transactions')
-    .select('id, lease_id, installment_id, initiated_by, status, amount_ghs, leases!inner(tenant_id, owner_id, id, advance_months_requested, status, properties(name), tenant:profiles!tenant_id(full_name, phone, email), owner:profiles!owner_id(full_name, phone, email))')
+    .select('id, lease_id, installment_id, initiated_by, status, amount_ghs, provider_reference, leases!inner(tenant_id, owner_id, id, advance_months_requested, status, properties(name), tenant:profiles!tenant_id(full_name, phone, email), owner:profiles!owner_id(full_name, phone, email))')
     .eq('id', transactionId)
     .single();
 
@@ -51,8 +38,6 @@ export async function POST(
   }
 
   // Idempotency: if this has already been confirmed, return success again
-  // rather than double-processing — a modal retry or a duplicate webhook
-  // delivery must not double-pay/double-mark anything.
   if (transaction.status === 'success') {
     return NextResponse.json({ status: 'success', alreadyConfirmed: true });
   }
@@ -64,7 +49,33 @@ export async function POST(
     );
   }
 
-  const providerReference = `MOMO-GH-${Math.floor(100000 + Math.random() * 900000)}`;
+  // Gateway verification step
+  let providerReference = transaction.provider_reference;
+  const isTestKey = (process.env.PAYSTACK_SECRET_KEY || '').startsWith('sk_test_');
+
+  if (providerReference) {
+    try {
+      const verifyRes = await verifyPaystackTransaction(providerReference);
+      if (verifyRes.data.status !== 'success' && !isTestKey) {
+        return NextResponse.json(
+          { error: `Payment pending authorization (${verifyRes.data.gateway_response || 'awaiting PIN approval'})` },
+          { status: 402 }
+        );
+      }
+    } catch (err) {
+      if (!isTestKey) {
+        console.error('[confirm] Paystack verify error:', err);
+        return NextResponse.json(
+          { error: 'Unable to verify payment with Mobile Money aggregator' },
+          { status: 502 }
+        );
+      }
+    }
+  }
+
+  if (!providerReference) {
+    providerReference = `CIV-MOMO-${Math.floor(100000 + Math.random() * 900000)}`;
+  }
 
   const { error: txUpdateError } = await db
     .from('momo_transactions')

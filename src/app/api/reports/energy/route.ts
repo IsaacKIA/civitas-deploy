@@ -33,7 +33,6 @@ export async function GET(request: NextRequest) {
 
   const totalKwh = ENERGY_MONTHLY.reduce((s, r) => s + r.kwh, 0);
   const totalSolar = ENERGY_MONTHLY.reduce((s, r) => s + r.solar, 0);
-  const totalGrid = ENERGY_MONTHLY.reduce((s, r) => s + r.grid, 0);
   const avgSolarPct = Math.round(ENERGY_MONTHLY.reduce((s, r) => s + r.solarPct, 0) / ENERGY_MONTHLY.length);
   const totalCost = ENERGY_MONTHLY.reduce((s, r) => s + parseInt(r.cost.replace(/[^0-9]/g, '')), 0);
   const co2Saved = Math.round(totalSolar * 0.00082 * 1000); // ~0.82 kg CO2 per kWh avoided

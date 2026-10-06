@@ -121,7 +121,6 @@ export const metadata: Metadata = {
     "geo.placename": "Accra, Ghana",
     "geo.position": "5.6358;-0.1601",
     "ICBM": "5.6358, -0.1601",
-    "google-site-verification": "google59e336434f702a44",
   },
 };
 

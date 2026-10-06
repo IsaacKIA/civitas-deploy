@@ -1,4 +1,4 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -9,14 +9,15 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           '/dashboard/',
           '/api/',
-          '/_next/',
-          '/static/',
         ],
       },
       {
         userAgent: ['Googlebot', 'Bingbot', 'Applebot', 'DuckDuckBot'],
         allow: ['/', '/portal'],
-        disallow: ['/dashboard/', '/api/'],
+        disallow: [
+          '/dashboard/',
+          '/api/',
+        ],
       },
     ],
     sitemap: 'https://www.civitasestate.com/sitemap.xml',

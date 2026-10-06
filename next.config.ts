@@ -24,14 +24,25 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
-        source: '/:path*',
+        source: '/',
         has: [
           {
             type: 'host',
             value: 'civitasestate.com',
           },
         ],
-        destination: 'https://www.civitasestate.com/:path*',
+        destination: 'https://www.civitasestate.com/',
+        permanent: true,
+      },
+      {
+        source: '/:path((?!sitemap\\.xml|robots\\.txt).+)',
+        has: [
+          {
+            type: 'host',
+            value: 'civitasestate.com',
+          },
+        ],
+        destination: 'https://www.civitasestate.com/:path',
         permanent: true,
       },
     ];
